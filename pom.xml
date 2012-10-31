@@ -13,11 +13,43 @@
         <maven>3.0.1</maven>
     </prerequisites>
 
+    <name>Rastajax</name>
+    <description>Library for dynamically generating descriptions for REST applications.</description>
+    <url>https://github.com/kelveden/rastajax</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:kelveden/rastajax.git</connection>
+        <developerConnection>scm:git:git@github.com:kelveden/rastajax.git</developerConnection>
+        <url>git@github.com:kelveden/rastajax.git</url>
+    </scm>
+
     <modules>
         <module>rastajax-core</module>
         <module>rastajax-representation</module>
         <module>rastajax-servlet</module>
     </modules>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <developers>
+        <developer>
+            <name>Alistair Dutton</name>
+            <roles>
+                <role>Lead Developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
 
     <dependencyManagement>
         <dependencies>

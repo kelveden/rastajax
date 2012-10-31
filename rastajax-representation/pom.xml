@@ -11,6 +11,9 @@
 
     <artifactId>rastajax-representation</artifactId>
 
+    <name>Rastajax Representation</name>
+    <description>Default representations for use with Rastajax.</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

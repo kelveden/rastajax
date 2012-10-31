@@ -11,6 +11,9 @@
 
     <artifactId>rastajax-servlet</artifactId>
 
+    <name>Rastajax Servlet</name>
+    <description>Default servlets for use with Rastajax.</description>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
