@@ -16,6 +16,9 @@
 package com.kelveden.rastajax.core;
 
 import com.kelveden.rastajax.core.raw.ResourceClass;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +27,9 @@ import java.util.Set;
  * Scans for REST resources and loads them into a single serializable representation.
  */
 public final class RestDescriber {
+
+    private static final int UNDERLINE_LENGTH = 60;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestDescriber.class);
 
     private RestDescriber() {
     }
@@ -42,7 +48,11 @@ public final class RestDescriber {
      */
     public static <T> T describeApplication(final Iterable<Class<?>> rawResourceClasses, final RepresentationBuilder<?> representationBuilder) {
 
+        logLoadingHeader();
+
         final Set<ResourceClass> resourceClasses = loadResources(rawResourceClasses);
+
+        logCreatingRepresentationHeader();
 
         return (T) representationBuilder.buildRepresentationFor(resourceClasses);
     }
@@ -62,9 +72,26 @@ public final class RestDescriber {
     public static <T> T describeResource(final Class<?> rawResourceClass, final RepresentationBuilder<?> representationBuilder) {
 
         final ResourceClassLoader loader = new ResourceClassLoader();
+
+        logLoadingHeader();
+
         final ResourceClass resourceClass = loader.loadResourceClassFrom(rawResourceClass);
 
+        logCreatingRepresentationHeader();
+
         return (T) representationBuilder.buildRepresentationFor(resourceClass);
+    }
+
+    private static void logCreatingRepresentationHeader() {
+        LOGGER.info(StringUtils.repeat("=", UNDERLINE_LENGTH));
+        LOGGER.info("Creating representation...");
+        LOGGER.info(StringUtils.repeat("=", UNDERLINE_LENGTH));
+    }
+
+    private static void logLoadingHeader() {
+        LOGGER.info(StringUtils.repeat("=", UNDERLINE_LENGTH));
+        LOGGER.info("Loading resource classes...");
+        LOGGER.info(StringUtils.repeat("=", UNDERLINE_LENGTH));
     }
 
     private static Set<ResourceClass> loadResources(final Iterable<Class<?>> classes) {
