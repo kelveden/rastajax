@@ -51,23 +51,12 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
 
             LOGGER.debug("This resource is a root resource.");
 
-            final List<FlatResourceMethod> resourceMethods = getResourceMethodsFrom(rawResource);
-            LOGGER.debug("This root resource has {} resource methods of its own.", resourceMethods.size());
+            final Map<String, List<ResourceClassMethod>> methodsOnResourceByPath = groupResourceMethodsByPath(rawResource);
 
-            if (resourceMethods.size() > 0) {
-                LOGGER.debug("This root resource's resource methods have been transformed into {} resource methods in the representation.", resourceMethods.size());
-                result.add(representResourceFrom(rawResource.getUriTemplate(), resourceMethods));
+            final List<FlatResource> methodsAsResources = representMethodsOnResourceFrom(methodsOnResourceByPath);
+            result.addAll(methodsAsResources);
 
-            } else {
-                LOGGER.debug("This root resource does not have any resource methods of its own; therefore will NOT add to representation.");
-            }
-
-            final Map<String, List<ResourceClassMethod>> subResourceMethodsGroupedByPaths = groupSubResourceMethodsByPath(rawResource);
-
-            final List<FlatResource> subResourcesAsResources = representResourceMethodsFrom(subResourceMethodsGroupedByPaths, rawResource);
-            result.addAll(subResourcesAsResources);
-
-            LOGGER.debug("Added sub-resources as resources with {} distinct URI templates.", subResourcesAsResources.size());
+            LOGGER.debug("Added sub-resources as resources with {} distinct URI templates.", methodsAsResources.size());
 
         } else {
             LOGGER.debug("This resource is NOT a root resource - skipping.");
@@ -94,41 +83,59 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         return result;
     }
 
-    private Map<String, List<ResourceClassMethod>> groupSubResourceMethodsByPath(final ResourceClass parentResource) {
+    private Map<String, List<ResourceClassMethod>> groupResourceMethodsByPath(final ResourceClass parentResource) {
 
         final Map<String, List<ResourceClassMethod>> pathToResourceMethodMap = new HashMap<String, List<ResourceClassMethod>>();
 
         for (ResourceClassMethod rawMethod : parentResource.getMethods()) {
 
-            final String uriTemplate = buildResourceMethodFullPathFrom(parentResource, rawMethod);
+            final String uriTemplate = buildResourceMethodFullUriTemplateFrom(parentResource, rawMethod);
+
+            LOGGER.debug("Found method '{}'.", rawMethod.getName());
 
             if (rawMethod instanceof SubResourceMethod) {
+
                 final SubResourceMethod subResourceMethod = (SubResourceMethod) rawMethod;
-                LOGGER.debug("Found sub-resource method with URI template '{}' and request method designator '{}'.", subResourceMethod.getUriTemplate(), subResourceMethod.getRequestMethodDesignator());
+                LOGGER.debug("Method is a sub-resource method with URI template '{}' and request method designator '{}'.", subResourceMethod.getUriTemplate(), subResourceMethod.getRequestMethodDesignator());
+
+                final List<ResourceClassMethod> rawMethodsWithPath = getRawMethodsWithPathFrom(uriTemplate, pathToResourceMethodMap);
+
+                rawMethodsWithPath.add(rawMethod);
+
+            } else if (rawMethod instanceof ResourceMethod) {
+
+                final ResourceMethod resourceMethod = (ResourceMethod) rawMethod;
+                LOGGER.debug("Method is a resource method with request method designator '{}'.", resourceMethod.getRequestMethodDesignator());
 
                 final List<ResourceClassMethod> rawMethodsWithPath = getRawMethodsWithPathFrom(uriTemplate, pathToResourceMethodMap);
 
                 rawMethodsWithPath.add(rawMethod);
 
             } else if (rawMethod instanceof SubResourceLocator) {
-                final SubResourceLocator subResourceLocator = (SubResourceLocator) rawMethod;
 
-                final List<ResourceClassMethod> rawMethodsWithPath = getRawMethodsWithPathFrom(uriTemplate, pathToResourceMethodMap);
+                final SubResourceLocator subResourceLocator = (SubResourceLocator) rawMethod;
+                LOGGER.debug("Method is a sub-resource locator with URI template '{}'.", subResourceLocator.getUriTemplate());
 
                 final ResourceClass subResource = subResourceLocator.getSubResource();
 
                 if (subResource != null) {
-                    final List<ResourceClassMethod> subResourceMethods = subResource.getMethods();
+                    LOGGER.debug("Analyzing methods on the class '{}' indicated by the sub-resource locator.", subResource.getRawClass());
 
-                    LOGGER.debug("Found sub-resource locator with URI template '{}' and {} sub-resource methods.", subResourceLocator.getUriTemplate(), subResourceMethods.size());
+                    final Map<String, List<ResourceClassMethod>> subResourceMethodsByPath = groupResourceMethodsByPath(subResource);
+                    for (Map.Entry<String, List<ResourceClassMethod>> entry : subResourceMethodsByPath.entrySet()) {
+                        final String methodUriTemplate = entry.getKey();
 
-                    for (ResourceClassMethod subResourceMethod : subResourceMethods) {
-                        LOGGER.debug("Found sub-resource method '{}' with request method designator '{}'.", subResourceMethod.getName(), getRequestMethodDesignator(subResourceMethod));
+                        final String fullUriTemplate = uriTemplate + (methodUriTemplate == null ? "" : "/" + methodUriTemplate);
+                        final List<ResourceClassMethod> resourceClassMethods = entry.getValue();
 
-                        rawMethodsWithPath.add(subResourceMethod);
+                        if (pathToResourceMethodMap.containsKey(fullUriTemplate)) {
+                            pathToResourceMethodMap.get(fullUriTemplate).addAll(resourceClassMethods);
+                        } else {
+                            pathToResourceMethodMap.put(fullUriTemplate, resourceClassMethods);
+                        }
                     }
 
-                    LOGGER.debug("This sub-resource locator has been transformed into {} resource methods on a resource with URI template '{}'.", subResourceMethods.size(), uriTemplate);
+                    LOGGER.debug("Finished analyzing sub-resource locator.", subResource.getRawClass());
 
                 } else {
                     LOGGER.debug("Could not find resource class corresponding to the return type from the sub-resource locator with URI template '{}'.", uriTemplate);
@@ -139,31 +146,24 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         return pathToResourceMethodMap;
     }
 
-    private String buildResourceMethodFullPathFrom(final ResourceClass resource, final ResourceClassMethod method) {
+    private String buildResourceMethodFullUriTemplateFrom(final ResourceClass resource, final ResourceClassMethod method) {
 
-        final String methodUriTemplate;
+        String fullUriTemplateRoot = "";
+        if (resource.getUriTemplate() != null) {
+            fullUriTemplateRoot = resource.getUriTemplate() + "/";
+        }
+
         if (method instanceof SubResourceLocator) {
-            methodUriTemplate = ((SubResourceLocator) method).getUriTemplate();
+            return fullUriTemplateRoot + ((SubResourceLocator) method).getUriTemplate();
+
         } else if (method instanceof SubResourceMethod) {
-            methodUriTemplate = ((SubResourceMethod) method).getUriTemplate();
-        } else {
-            methodUriTemplate = null;
-        }
+            return fullUriTemplateRoot + ((SubResourceMethod) method).getUriTemplate();
 
-        if (methodUriTemplate != null) {
-            return resource.getUriTemplate() + "/" + methodUriTemplate;
-        } else {
-            return null;
-        }
-    }
+        } else if (method instanceof ResourceMethod) {
+            return resource.getUriTemplate();
 
-    private String getRequestMethodDesignator(final ResourceClassMethod method) {
-
-        if (method instanceof ResourceMethod) {
-            return ((ResourceMethod) method).getRequestMethodDesignator();
-        } else if (method instanceof SubResourceMethod) {
-            return ((SubResourceMethod) method).getRequestMethodDesignator();
         } else {
+            // Will never happen as the method types will never change (unless the JAX-RS spec changes perhaps...)
             return null;
         }
     }
@@ -178,19 +178,6 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         }
 
         return rawMethodsWithPath;
-    }
-
-    private List<FlatResourceMethod> getResourceMethodsFrom(final ResourceClass rawResource) {
-
-        final List<FlatResourceMethod> resourceMethods = new ArrayList<FlatResourceMethod>();
-
-        for (ResourceClassMethod methodOnResource : rawResource.getMethods()) {
-            if (methodOnResource instanceof ResourceMethod) {
-                resourceMethods.add(representResourceMethodFrom((ResourceMethod) methodOnResource, rawResource));
-            }
-        }
-
-        return resourceMethods;
     }
 
     private FlatResourceMethod representResourceMethodFrom(final ResourceClassMethod rawMethod, final ResourceClass rawResource) {
@@ -254,7 +241,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         return string.substring(0, 1).toLowerCase(Locale.getDefault()) + string.substring(1);
     }
 
-    private List<FlatResource> representResourceMethodsFrom(final Map<String, List<ResourceClassMethod>> subResourceMethodsGroupedByPaths, final ResourceClass rawResource) {
+    private List<FlatResource> representMethodsOnResourceFrom(final Map<String, List<ResourceClassMethod>> subResourceMethodsGroupedByPaths) {
 
         final List<FlatResource> result = new ArrayList<FlatResource>();
 
@@ -263,7 +250,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
 
             final List<FlatResourceMethod> flatResourceMethods = new ArrayList<FlatResourceMethod>();
             for (ResourceClassMethod rawMethod : subResourceMethodsGroupedByPath.getValue()) {
-                flatResourceMethods.add(representResourceMethodFrom(rawMethod, rawResource));
+                flatResourceMethods.add(representResourceMethodFrom(rawMethod, rawMethod.getResourceClass()));
             }
 
             result.add(representResourceFrom(uriTemplate, flatResourceMethods));
@@ -274,11 +261,11 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
 
     private FlatResource representResourceFrom(final String uriTemplate, final List<FlatResourceMethod> resourceMethods) {
 
-        final String cleanPath = cleanupUriTemplate(uriTemplate);
+        final String cleanUriTemplate = cleanupUriTemplate(uriTemplate);
 
-        LOGGER.info("Added resource with URI template '{}' to representation with {} resource methods.", cleanPath, resourceMethods.size());
+        LOGGER.info("Added resource with URI template '{}' to representation with {} resource methods.", cleanUriTemplate, resourceMethods.size());
 
-        return new FlatResource(cleanPath, resourceMethods);
+        return new FlatResource(cleanUriTemplate, resourceMethods);
     }
 
     private String cleanupUriTemplate(final String uriTemplate) {

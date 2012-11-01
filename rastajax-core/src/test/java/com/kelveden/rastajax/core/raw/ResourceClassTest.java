@@ -64,6 +64,14 @@ public class ResourceClassTest {
     }
 
     @Test
+    public void methodsAreAssignedResourceClass() {
+
+        final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(dummyMethod()), DUMMY_CONSUMES, DUMMY_PRODUCES);
+
+        assertThat(resource.getMethods().get(0).getResourceClass(), sameInstance(resource));
+    }
+
+    @Test
     public void methodsIsImmutable() {
 
         thrown.expect(UnsupportedOperationException.class);

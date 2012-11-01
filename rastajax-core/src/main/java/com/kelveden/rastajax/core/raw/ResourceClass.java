@@ -29,10 +29,15 @@ public final class ResourceClass {
     private final List<String> consumes;
     private final List<String> produces;
 
-    public ResourceClass(final Class<?> rawClass, final String uriTemplate, final List<ResourceClassMethod> methodsOnResource, final List<String> consumes, final List<String> produces) {
+    public ResourceClass(final Class<?> rawClass, final String uriTemplate, final List<ResourceClassMethod> methods, final List<String> consumes, final List<String> produces) {
         this.rawClass = rawClass;
         this.uriTemplate = uriTemplate;
-        this.methods = Collections.unmodifiableList(methodsOnResource);
+
+        for (ResourceClassMethod method : methods) {
+            method.setResourceClass(this);
+        }
+
+        this.methods = Collections.unmodifiableList(methods);
         this.consumes = Collections.unmodifiableList(consumes);
         this.produces = Collections.unmodifiableList(produces);
     }
