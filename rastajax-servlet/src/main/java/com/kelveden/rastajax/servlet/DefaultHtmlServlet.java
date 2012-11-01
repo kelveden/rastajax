@@ -44,7 +44,7 @@ public class DefaultHtmlServlet extends HttpServlet {
         super.init();
 
         final ServletContext context = getServletContext();
-        apiPackages = context.getInitParameter("apiPackages");
+        apiPackages = context.getInitParameter("rastajax.apipackages");
     }
 
     @Override
