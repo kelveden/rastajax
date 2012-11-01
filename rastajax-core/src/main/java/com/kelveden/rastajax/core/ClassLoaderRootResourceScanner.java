@@ -15,23 +15,16 @@
  */
 package com.kelveden.rastajax.core;
 
-import org.apache.commons.lang.StringUtils;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
+import org.scannotation.AnnotationDB;
+import org.scannotation.ClasspathUrlFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * {@link RootResourceScanner} that scans in all JAX-RS resources it can find directly from the specified packages pulled from the classpath.
@@ -40,7 +33,10 @@ public class ClassLoaderRootResourceScanner implements RootResourceScanner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassLoaderRootResourceScanner.class);
 
-    private final Reflections reflections;
+    private final List<URL> scanUrls;
+    private final ClassLoader classLoader;
+
+    private boolean scanInterfaces;
 
     /**
      * Constructor.
@@ -52,27 +48,24 @@ public class ClassLoaderRootResourceScanner implements RootResourceScanner {
      */
     public ClassLoaderRootResourceScanner(final ClassLoader classLoader, final String... resourcePackages) {
 
-        final ConfigurationBuilder configBuilder = new ConfigurationBuilder()
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
-                .addClassLoader(classLoader);
-
-        final FilterBuilder filterBuilder = new FilterBuilder();
-        final List<URL> urls = new ArrayList<URL>();
+        this.classLoader = classLoader;
+        scanUrls = new ArrayList<URL>();
 
         for (String resourcePackage : resourcePackages) {
-            final Set<URL> resourcePackageUrls = ClasspathHelper.forPackage(resourcePackage, classLoader);
+
+            final URL[] resourcePackageUrls = ClasspathUrlFinder.findResourceBases(resourcePackage.replace(".", "/"), classLoader);
+            scanUrls.addAll(Arrays.asList(resourcePackageUrls));
 
             LOGGER.debug("Package {} will be scanned from urls: {}.", resourcePackage, resourcePackageUrls);
-
-            filterBuilder.include(FilterBuilder.prefix(resourcePackage));
-            urls.addAll(resourcePackageUrls);
         }
+    }
 
-        configBuilder
-                .filterInputsBy(filterBuilder)
-                .setUrls(urls);
+    public ClassLoaderRootResourceScanner allowInterfaceInheritance() {
+        this.scanInterfaces = true;
 
-        reflections = new Reflections(configBuilder);
+        LOGGER.info("JAX-RS annotations at class-level on interfaces will be honoured.");
+
+        return this;
     }
 
     @Override
@@ -85,23 +78,50 @@ public class ClassLoaderRootResourceScanner implements RootResourceScanner {
 
         final Set<Class<?>> results = new HashSet<Class<?>>();
 
-        final Set<Class<?>> allTypesAnnotatedWithPath = reflections.getTypesAnnotatedWith(Path.class, false);
-        LOGGER.debug("Scanned {} classes annotated with @Path: {}", allTypesAnnotatedWithPath.size(), allTypesAnnotatedWithPath);
+        final AnnotationDB annotationDb = new AnnotationDB();
+        annotationDb.setScanClassAnnotations(true);
+        annotationDb.setScanMethodAnnotations(false);
+        annotationDb.setScanParameterAnnotations(false);
+        annotationDb.setScanFieldAnnotations(false);
 
-        for (Class<?> clazz : allTypesAnnotatedWithPath) {
-            final int classModifiers = clazz.getModifiers();
+        try {
+            annotationDb.scanArchives(scanUrls.toArray(new URL[scanUrls.size()]));
 
-            if (!Modifier.isInterface(classModifiers) && !Modifier.isAbstract(clazz.getModifiers())) {
-                results.add(clazz);
+            if (scanInterfaces) {
+                annotationDb.crossReferenceImplementedInterfaces();
+            }
+
+        } catch (final IOException e) {
+            throw new ResourceScanningException(e);
+
+        } catch (final AnnotationDB.CrossReferenceException e) {
+            LOGGER.debug("Some of the interfaces referenced in the scanned classes could not be cross-referenced. " +
+                        "This isn't a problem as long as it doesn't include actual REST resource classes. The list of unresolved interfaces: {}", e.getUnresolved());
+        }
+
+        Set<String> classesAnnotatedWithPath = annotationDb.getAnnotationIndex().get(Path.class.getName());
+        if (classesAnnotatedWithPath == null) {
+            classesAnnotatedWithPath = new HashSet<String>();
+        }
+
+        LOGGER.debug("Found {} classes annotated with @Path: {}.", classesAnnotatedWithPath.size(), classesAnnotatedWithPath.toString());
+
+        for (String className : classesAnnotatedWithPath) {
+            try {
+                final Class<?> loadedClass = classLoader.loadClass(className);
+                final int classModifiers = loadedClass.getModifiers();
+
+                if (!Modifier.isAbstract(classModifiers) && !Modifier.isInterface(classModifiers)) {
+                    results.add(classLoader.loadClass(className));
+                }
+
+            } catch (final ClassNotFoundException e) {
+                throw new ResourceScanningException(e);
             }
         }
 
-        LOGGER.debug("Scanned {} root resource classes: {}", results.size(), results.toString());
+        LOGGER.debug("Scanned {} root resource classes: {}.", results.size(), results.toString());
 
         return results;
-    }
-
-    public ClassLoaderRootResourceScanner allowInterfaceInheritance() {
-        return this;
     }
 }
