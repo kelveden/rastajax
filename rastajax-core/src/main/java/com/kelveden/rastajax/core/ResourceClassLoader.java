@@ -120,7 +120,9 @@ class ResourceClassLoader {
 
     private ResourceClassMethod loadMethodFrom(final Class<?> candidateResourceClass, final Method method) {
 
-        LOGGER.debug("Attempting to load method {} as a JAX-RS resource method...", method.getName());
+        final String logPrefix = " |-";
+
+        LOGGER.debug("{} Attempting to load method {} as a JAX-RS resource method...", logPrefix, method.getName());
 
         String requestMethodDesignator = null;
         String uriTemplate = null;
@@ -129,10 +131,10 @@ class ResourceClassLoader {
         Class<?> returnType = method.getReturnType();
 
         final Set<Annotation> methodAnnotations =  JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(candidateResourceClass, method);
-        LOGGER.debug("Found method annotations {}.", methodAnnotations.toString());
+        LOGGER.debug("{} Found method annotations {}.", logPrefix, methodAnnotations.toString());
 
         if (returnType != null) {
-            LOGGER.debug("Method return type is {}.", returnType.getName());
+            LOGGER.debug("{} Method return type is {}.", logPrefix, returnType.getName());
         }
 
         for (Annotation annotation : methodAnnotations) {
@@ -142,32 +144,32 @@ class ResourceClassLoader {
             if (httpMethodAnnotation != null) {
                 requestMethodDesignator = httpMethodAnnotation.value();
 
-                LOGGER.debug("Method request method designator is '{}'.", requestMethodDesignator);
+                LOGGER.debug("{} Method request method designator is '{}'.", logPrefix, requestMethodDesignator);
 
             } else if (annotation.annotationType() == Path.class) {
                 uriTemplate = ((Path) annotation).value();
 
-                LOGGER.debug("Method URI template '{}'.", uriTemplate);
+                LOGGER.debug("{} Method URI template '{}'.", logPrefix, uriTemplate);
 
             } else if (annotation.annotationType() == Produces.class) {
                 produces = ((Produces) annotation).value();
 
-                LOGGER.debug("Method produces: {}.", StringUtils.join(produces, ","));
+                LOGGER.debug("{} Method produces: {}.", logPrefix, StringUtils.join(produces, ","));
 
             } else if (annotation.annotationType() == Consumes.class) {
                 consumes = ((Consumes) annotation).value();
 
-                LOGGER.debug("Method consumes: {}.", StringUtils.join(consumes, ","));
+                LOGGER.debug("{} Method consumes: {}.", logPrefix, StringUtils.join(consumes, ","));
             }
         }
 
         if ((uriTemplate == null) && (requestMethodDesignator == null)) {
-            LOGGER.debug("Method is NOT a resource method.");
+            LOGGER.debug("{} Method is NOT a resource method.", logPrefix);
             return null;
         }
 
-        LOGGER.debug("Method is a resource method.");
-        LOGGER.debug("Finding method parameters...");
+        LOGGER.debug("{} Method is a resource method.", logPrefix );
+        LOGGER.debug("{} Finding method parameters...", logPrefix);
 
         final List<ResourceClassMethodParameter> parameters = loadMethodParameters(candidateResourceClass, method);
 
@@ -192,8 +194,10 @@ class ResourceClassLoader {
 
     private ResourceClassMethodParameter loadMethodParameter(final Class<?> clazz, final Method method, final int parameterIndex) {
 
+        final String logPrefix = " |---";
+
         final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(clazz, method, parameterIndex);
-        LOGGER.debug("Found parameter annotations {}.", annotations.toString());
+        LOGGER.debug("{} Found parameter annotations {}.", logPrefix, annotations.toString());
 
         for (Annotation annotation : annotations) {
             final Class<? extends Annotation> parameterType = annotation.annotationType();
@@ -203,7 +207,7 @@ class ResourceClassLoader {
                 try {
                     final String name = (String) annotation.annotationType().getMethod("value").invoke(annotation);
 
-                    LOGGER.debug("Found {} parameter '{}' of type '{}'.", parameterType, name, type);
+                    LOGGER.debug("{} Found {} parameter '{}' of type '{}'.", parameterType, name, type);
 
                     return new ResourceClassMethodParameter(name, parameterType, type);
 
