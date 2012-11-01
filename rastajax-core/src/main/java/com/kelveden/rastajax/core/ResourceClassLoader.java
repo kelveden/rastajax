@@ -52,15 +52,15 @@ class ResourceClassLoader {
         final Set<Annotation> resourceAnnotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(candidateResourceClass);
         LOGGER.debug("Found class annotations {}.", resourceAnnotations.toString());
 
-        String path = null;
+        String uriTemplate = null;
         String[] produces = null;
         String[] consumes = null;
 
         for (Annotation annotation : resourceAnnotations) {
             if (annotation.annotationType() == Path.class) {
-                path = ((Path) annotation).value();
+                uriTemplate = ((Path) annotation).value();
 
-                LOGGER.debug("Class URI template is '{}'.", path);
+                LOGGER.debug("Class URI template is '{}'.", uriTemplate);
 
             } else if (annotation.annotationType() == Produces.class) {
                 produces = ((Produces) annotation).value();
@@ -87,7 +87,7 @@ class ResourceClassLoader {
 
         LOGGER.debug("Class is a resource class.");
 
-        return new ResourceClass(candidateResourceClass, path, methodsOnResource, arrayAsList(consumes), arrayAsList(produces));
+        return new ResourceClass(candidateResourceClass, uriTemplate, methodsOnResource, arrayAsList(consumes), arrayAsList(produces));
     }
 
     private List<String> arrayAsList(final String[] array) {
@@ -123,7 +123,7 @@ class ResourceClassLoader {
         LOGGER.debug("Attempting to load method {} as a JAX-RS resource method...", method.getName());
 
         String requestMethodDesignator = null;
-        String path = null;
+        String uriTemplate = null;
         String[] produces = null;
         String[] consumes = null;
         Class<?> returnType = method.getReturnType();
@@ -145,9 +145,9 @@ class ResourceClassLoader {
                 LOGGER.debug("Method request method designator is '{}'.", requestMethodDesignator);
 
             } else if (annotation.annotationType() == Path.class) {
-                path = ((Path) annotation).value();
+                uriTemplate = ((Path) annotation).value();
 
-                LOGGER.debug("Method URI template '{}'.", path);
+                LOGGER.debug("Method URI template '{}'.", uriTemplate);
 
             } else if (annotation.annotationType() == Produces.class) {
                 produces = ((Produces) annotation).value();
@@ -161,7 +161,7 @@ class ResourceClassLoader {
             }
         }
 
-        if ((path == null) && (requestMethodDesignator == null)) {
+        if ((uriTemplate == null) && (requestMethodDesignator == null)) {
             LOGGER.debug("Method is NOT a resource method.");
             return null;
         }
@@ -171,7 +171,7 @@ class ResourceClassLoader {
 
         final List<ResourceClassMethodParameter> parameters = loadMethodParameters(candidateResourceClass, method);
 
-        return createResourceClassMethod(candidateResourceClass, method, path, requestMethodDesignator, arrayAsList(consumes), arrayAsList(produces), parameters);
+        return createResourceClassMethod(candidateResourceClass, method, uriTemplate, requestMethodDesignator, arrayAsList(consumes), arrayAsList(produces), parameters);
     }
 
     private List<ResourceClassMethodParameter> loadMethodParameters(Class<?> resourceClass, Method method) {
@@ -222,13 +222,13 @@ class ResourceClassLoader {
         return null;
     }
 
-    private ResourceClassMethod createResourceClassMethod(final Class<?> resourceClass, final Method method, final String path, final String requestMethodDesignator, final List<String> consumes, final List<String> produces, final List<ResourceClassMethodParameter> parameters) {
+    private ResourceClassMethod createResourceClassMethod(final Class<?> resourceClass, final Method method, final String uriTemplate, final String requestMethodDesignator, final List<String> consumes, final List<String> produces, final List<ResourceClassMethodParameter> parameters) {
 
-        final boolean hasPath = (path != null);
+        final boolean hasPath = (uriTemplate != null);
         final boolean hasRequestMethodDesignator = (requestMethodDesignator != null);
 
         if (hasPath && hasRequestMethodDesignator) {
-            return new SubResourceMethod(method.getName(), path, requestMethodDesignator, consumes, produces, parameters, method.getReturnType());
+            return new SubResourceMethod(method.getName(), uriTemplate, requestMethodDesignator, consumes, produces, parameters, method.getReturnType());
 
         } else if (hasPath && !hasRequestMethodDesignator) {
 
@@ -237,7 +237,7 @@ class ResourceClassLoader {
             if (returnType != null) {
                 final ResourceClass subResource = loadResourceClassFrom(method.getReturnType());
 
-                return new SubResourceLocator(method.getName(), path, consumes, produces, parameters, subResource);
+                return new SubResourceLocator(method.getName(), uriTemplate, consumes, produces, parameters, subResource);
             } else {
                 throw new ResourceClassLoadingException("Method '" + method.getName() + "' appears to be a sub-resource locator but has no return type.");
             }

@@ -26,8 +26,8 @@ public final class FlatResource {
     private final String uriTemplate;
     private final List<FlatResourceMethod> resourceMethods;
 
-    FlatResource(final String path, final List<FlatResourceMethod> resourceMethods) {
-        this.uriTemplate = path;
+    FlatResource(final String uriTemplate, final List<FlatResourceMethod> resourceMethods) {
+        this.uriTemplate = uriTemplate;
         this.resourceMethods = Collections.unmodifiableList(resourceMethods);
     }
 

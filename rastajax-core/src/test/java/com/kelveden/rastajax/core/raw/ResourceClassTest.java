@@ -52,7 +52,7 @@ public class ResourceClassTest {
 
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, "mypath", DUMMY_METHODs, DUMMY_CONSUMES, DUMMY_PRODUCES);
 
-        assertThat(resource.getPath(), is("mypath"));
+        assertThat(resource.getUriTemplate(), is("mypath"));
     }
 
     @Test

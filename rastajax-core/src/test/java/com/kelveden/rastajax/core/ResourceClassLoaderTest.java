@@ -146,7 +146,7 @@ public class ResourceClassLoaderTest {
         final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
 
         // Then
-        MatcherAssert.assertThat(resource.getPath(), is(PATH));
+        MatcherAssert.assertThat(resource.getUriTemplate(), is(PATH));
     }
 
     @Test
@@ -166,7 +166,7 @@ public class ResourceClassLoaderTest {
         final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
 
         // Then
-        MatcherAssert.assertThat(resource.getPath(), nullValue());
+        MatcherAssert.assertThat(resource.getUriTemplate(), nullValue());
     }
 
     @Test

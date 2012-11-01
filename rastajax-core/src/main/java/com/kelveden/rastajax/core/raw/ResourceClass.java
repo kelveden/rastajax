@@ -24,21 +24,21 @@ import java.util.List;
 public final class ResourceClass {
 
     private final Class<?> rawClass;
-    private final String path;
+    private final String uriTemplate;
     private final List<ResourceClassMethod> methods;
     private final List<String> consumes;
     private final List<String> produces;
 
-    public ResourceClass(final Class<?> rawClass, final String path, final List<ResourceClassMethod> methodsOnResource, final List<String> consumes, final List<String> produces) {
+    public ResourceClass(final Class<?> rawClass, final String uriTemplate, final List<ResourceClassMethod> methodsOnResource, final List<String> consumes, final List<String> produces) {
         this.rawClass = rawClass;
-        this.path = path;
+        this.uriTemplate = uriTemplate;
         this.methods = Collections.unmodifiableList(methodsOnResource);
         this.consumes = Collections.unmodifiableList(consumes);
         this.produces = Collections.unmodifiableList(produces);
     }
 
-    public String getPath() {
-        return path;
+    public String getUriTemplate() {
+        return uriTemplate;
     }
 
     public List<ResourceClassMethod> getMethods() {
@@ -54,7 +54,7 @@ public final class ResourceClass {
     }
 
     public boolean isRootResource() {
-        return (path != null) && (methods.size() > 0) ;
+        return (uriTemplate != null) && (methods.size() > 0) ;
     }
 
     public Class<?> getRawClass() {

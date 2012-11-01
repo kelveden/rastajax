@@ -44,7 +44,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         final TreeSet<FlatResource> result = new TreeSet<FlatResource>(RESOURCE_COMPARATOR);
 
         LOGGER.debug(StringUtils.repeat("-", UNDERLINE_LENGTH));
-        LOGGER.debug("Transforming raw resource with path {}...", rawResource.getPath());
+        LOGGER.debug("Building representation for resource with URI template {}...", rawResource.getUriTemplate());
         LOGGER.debug(StringUtils.repeat("-", UNDERLINE_LENGTH));
 
         if (rawResource.isRootResource()) {
@@ -56,7 +56,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
 
             if (resourceMethods.size() > 0) {
                 LOGGER.debug("This root resource's resource methods have been transformed into {} resource methods in the representation.", resourceMethods.size());
-                result.add(representResourceFrom(rawResource.getPath(), resourceMethods));
+                result.add(representResourceFrom(rawResource.getUriTemplate(), resourceMethods));
 
             } else {
                 LOGGER.debug("This root resource does not have any resource methods of its own; therefore will NOT add to representation.");
@@ -123,7 +123,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
                     LOGGER.debug("Found sub-resource locator with URI template '{}' and {} sub-resource methods.", subResourceLocator.getUriTemplate(), subResourceMethods.size());
 
                     for (ResourceClassMethod subResourceMethod : subResourceMethods) {
-                        LOGGER.debug("Found sub-resource method '{}' with request method designator '{}'.", subResourceMethod.getName(), ((ResourceMethod) subResourceMethod).getRequestMethodDesignator());
+                        LOGGER.debug("Found sub-resource method '{}' with request method designator '{}'.", subResourceMethod.getName(), getRequestMethodDesignator(subResourceMethod));
 
                         rawMethodsWithPath.add(subResourceMethod);
                     }
@@ -151,7 +151,18 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         }
 
         if (methodUriTemplate != null) {
-            return resource.getPath() + "/" + methodUriTemplate;
+            return resource.getUriTemplate() + "/" + methodUriTemplate;
+        } else {
+            return null;
+        }
+    }
+
+    private String getRequestMethodDesignator(final ResourceClassMethod method) {
+
+        if (method instanceof ResourceMethod) {
+            return ((ResourceMethod) method).getRequestMethodDesignator();
+        } else if (method instanceof SubResourceMethod) {
+            return ((SubResourceMethod) method).getRequestMethodDesignator();
         } else {
             return null;
         }
@@ -248,14 +259,14 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         final List<FlatResource> result = new ArrayList<FlatResource>();
 
         for (Map.Entry<String, List<ResourceClassMethod>> subResourceMethodsGroupedByPath : subResourceMethodsGroupedByPaths.entrySet()) {
-            final String path = subResourceMethodsGroupedByPath.getKey();
+            final String uriTemplate = subResourceMethodsGroupedByPath.getKey();
 
             final List<FlatResourceMethod> flatResourceMethods = new ArrayList<FlatResourceMethod>();
             for (ResourceClassMethod rawMethod : subResourceMethodsGroupedByPath.getValue()) {
                 flatResourceMethods.add(representResourceMethodFrom(rawMethod, rawResource));
             }
 
-            result.add(representResourceFrom(path, flatResourceMethods));
+            result.add(representResourceFrom(uriTemplate, flatResourceMethods));
         }
 
         return result;
@@ -263,14 +274,14 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
 
     private FlatResource representResourceFrom(final String uriTemplate, final List<FlatResourceMethod> resourceMethods) {
 
-        final String cleanPath = cleanupPath(uriTemplate);
+        final String cleanPath = cleanupUriTemplate(uriTemplate);
 
         LOGGER.info("Added resource with URI template '{}' to representation with {} resource methods.", cleanPath, resourceMethods.size());
 
         return new FlatResource(cleanPath, resourceMethods);
     }
 
-    private String cleanupPath(final String path) {
-        return path.replaceAll("/+", "/");
+    private String cleanupUriTemplate(final String uriTemplate) {
+        return uriTemplate.replaceAll("/+", "/");
     }
 }
