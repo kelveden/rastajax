@@ -1,7 +1,7 @@
 Rastajax
 ========
 
-IMPORTANT: This project is in its early stages of evolution. There are currently NO releases available, just the source code. As soon as I have a first release ready I'll get it pushed to Maven Central. Keep your eyes on issue #1 for an indication of when this is done.
+IMPORTANT: This project is in its early stages of evolution. There are currently NO releases available, just the source code. As soon as I have a first release ready I'll get it pushed to Maven Central. Keep your eyes on [issue #1](https://github.com/kelveden/rastajax/issues/1) for an indication of when this is done.
 
 A lightweight library for dynamically generating descriptions REST APIs.
 
