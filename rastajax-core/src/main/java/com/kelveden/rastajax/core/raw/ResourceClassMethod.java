@@ -31,7 +31,6 @@ public abstract class ResourceClassMethod {
 
     protected ResourceClassMethod(final String name, final List<String> consumes, final List<String> produces, final List<ResourceClassMethodParameter> parameters) {
         this.name = name;
-        this.resourceClass = resourceClass;
         this.consumes = Collections.unmodifiableList(consumes);
         this.produces = Collections.unmodifiableList(produces);
         this.parameters = Collections.unmodifiableList(parameters);

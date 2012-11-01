@@ -168,7 +168,7 @@ class ResourceClassLoader {
             return null;
         }
 
-        LOGGER.debug("{} Method is a resource method.", logPrefix );
+        LOGGER.debug("{} Method is a resource method.", logPrefix);
         LOGGER.debug("{} Finding method parameters...", logPrefix);
 
         final List<ResourceClassMethodParameter> parameters = loadMethodParameters(candidateResourceClass, method);
