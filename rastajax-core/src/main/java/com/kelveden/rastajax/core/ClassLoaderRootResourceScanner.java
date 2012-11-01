@@ -98,7 +98,10 @@ public class ClassLoaderRootResourceScanner implements RootResourceScanner {
             throw new ResourceScanningException(e);
         }
 
-        final Set<String> classesAnnotatedWithPath = annotationDb.getAnnotationIndex().get(Path.class.getName());
+        Set<String> classesAnnotatedWithPath = annotationDb.getAnnotationIndex().get(Path.class.getName());
+        if (classesAnnotatedWithPath == null) {
+            classesAnnotatedWithPath = new HashSet<String>();
+        }
 
         LOGGER.debug("Found {} classes annotated with @Path: {}.", classesAnnotatedWithPath.size(), classesAnnotatedWithPath.toString());
 
