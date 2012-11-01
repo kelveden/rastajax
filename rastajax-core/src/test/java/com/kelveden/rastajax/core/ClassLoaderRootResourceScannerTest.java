@@ -53,14 +53,14 @@ public class ClassLoaderRootResourceScannerTest {
     public void allRootResourceClassesInPackageAreScanned() throws IOException {
 
         // Given
-        final String source1 = "package package1; import javax.ws.rs.*; @Path(\"some/path1\") public class SomeClass1 { }";
-        final String source2 = "package package1; import javax.ws.rs.*; @Path(\"some/path2\") public class SomeClass2 { }";
-        final String source3 = "package package1; import javax.ws.rs.*; @Path(\"some/path3\") public class SomeClass3 { }";
+        final String source1 = "package my.package1; import javax.ws.rs.*; @Path(\"some/path1\") public class SomeClass1 { }";
+        final String source2 = "package my.package1; import javax.ws.rs.*; @Path(\"some/path2\") public class SomeClass2 { }";
+        final String source3 = "package my.package1; import javax.ws.rs.*; @Path(\"some/path3\") public class SomeClass3 { }";
 
         compiler.compileFromSource(source1, source2, source3);
 
         // When
-        final ClassLoaderRootResourceScanner scanner = new ClassLoaderRootResourceScanner(compiler.getClassLoader(), "package1");
+        final ClassLoaderRootResourceScanner scanner = new ClassLoaderRootResourceScanner(compiler.getClassLoader(), "my.package1");
         final Set<Class<?>> results = scanner.scan();
 
         // Then

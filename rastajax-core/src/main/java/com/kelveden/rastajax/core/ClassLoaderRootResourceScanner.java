@@ -53,7 +53,7 @@ public class ClassLoaderRootResourceScanner implements RootResourceScanner {
 
         for (String resourcePackage : resourcePackages) {
 
-            final URL[] resourcePackageUrls = ClasspathUrlFinder.findResourceBases(resourcePackage, classLoader);
+            final URL[] resourcePackageUrls = ClasspathUrlFinder.findResourceBases(resourcePackage.replace(".", "/"), classLoader);
             scanUrls.addAll(Arrays.asList(resourcePackageUrls));
 
             LOGGER.debug("Package {} will be scanned from urls: {}.", resourcePackage, resourcePackageUrls);
