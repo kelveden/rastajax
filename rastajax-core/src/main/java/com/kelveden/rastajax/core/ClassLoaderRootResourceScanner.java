@@ -95,7 +95,7 @@ public class ClassLoaderRootResourceScanner implements RootResourceScanner {
             throw new ResourceScanningException(e);
 
         } catch (final AnnotationDB.CrossReferenceException e) {
-            throw new ResourceScanningException(e);
+            throw new ResourceScanningException("Could not cross-reference implementations with interfaces. Unresolved: " + e.getUnresolved(), e);
         }
 
         Set<String> classesAnnotatedWithPath = annotationDb.getAnnotationIndex().get(Path.class.getName());

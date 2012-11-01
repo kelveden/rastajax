@@ -29,4 +29,16 @@ public class ResourceScanningException extends RuntimeException {
     public ResourceScanningException(final Throwable cause) {
         super("There was a problem scanning in the resources.", cause);
     }
+
+    /**
+     * Constructor.
+     *
+     * @param message
+     *      The error message.
+     * @param cause
+     *      The underlying cause of the exception.
+     */
+    public ResourceScanningException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }
