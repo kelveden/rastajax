@@ -30,7 +30,7 @@ Rastajax ships with some default servlets that you can hook in to your REST appl
 
 1) Add the _rastajax-servlet_ and _rastajax-core_ libraries to your REST application classpath. If you're using Maven as your build tool, this is straightforward enough; add this to your POM:
 
-```
+```xml
 <groupId>com.kelveden.rastajax</groupId>
 <artifactId>rastajax-servlet</artifactId>
 <version>???</version>
@@ -41,7 +41,7 @@ Rastajax ships with some default servlets that you can hook in to your REST appl
 
 2) Hook the servlet(s) into your application web.xml:
 
-```
+```xml
 <context-param>
     <param-name>rastajax.apipackages</param-name>
     <param-value>your.rest.application.package1,your.rest.application.package2</param-value>
