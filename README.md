@@ -10,5 +10,37 @@ Key features:
 * Standards compliant. Generation of descriptions is based entirely on the annotations from the [JAX-RS 1.1 Specification](http://jsr311.java.net/) plus a single custom annotation.
 * Completely independent of any JAX-RS implementation.
 * Lightweight. Dependencies both direct and transitive are kept to a minimum. 
+* Extensible. Rastajax can be extended with classes that:
+   * implement alternative strategies for finding resource classes.
+   * use the information scanned in from your resource classes to describe your API in alternative ways
 
-More to follow...
+What's in the box
+-----------------
+Rastajax comes as 3 Maven artifacts:
+
+* _rastajax-core_: The core library. This is the minimum you will need to add to your REST application's classpath.
+* _rastajax-representation_: Contains the default REST API description representations supported by Rastajax. You can extend Rastajax with your own representations either in your own codebase or (even better!) to the _rastajax-representation_ library itself. See [the wiki](https://github.com/kelveden/rastajax/wiki/Extending-Rastajax) for more details.
+* _rastajax-servlet_: Contains the default servlets that you can use to quickly try out Rastajax. See the "Quick start" section below for more details.
+
+Quick start
+-----------
+
+Rastajax ships with some default servlets that you can hook in to your REST application to quickly try it out. Here's what you need to do:
+
+1) Add the _rastajax-servlet_ and _rastajax-core_ libraries to your REST application classpath. If you're using Maven as your build tool, this is straightforward enough; add this to your POM:
+
+```
+<groupId>com.kelveden.rastajax</groupId>
+<artifactId>rastajax-servlet</artifactId>
+<version>???</version>
+<scope>runtime</scope>
+```
+
+(Maven will pull in _rastajax-core_ as a transitive dependency.)
+
+2) Hook the servlet(s) into your application web.xml:
+
+TODO
+
+That's it! Now just browse to the servlets from your API and see examples of your API described as JSON and HTML. You can continue using these servlets of course but you'll probably want something more sophisticated longer term. See [the wiki](https://github.com/kelveden/rastajax/wiki/Using-Rastajax) for more details on creating how to create your own Rastajax integration.
+
