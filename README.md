@@ -3,9 +3,10 @@ Rastajax
 
 > **IMPORTANT**: This project is in its early stages of evolution. There are currently NO releases available, just the source code. As soon as I have a first release ready I'll get it pushed to Maven Central. Keep your eyes on [issue #1](https://github.com/kelveden/rastajax/issues/1) for an indication of when this is done. Whilst it is already usable, I strongly suggest that you hold off trying Rastajax until then as there are likely to be a fair few changes breaking backwards compatibility until then.
 
-A lightweight library for dynamically generating descriptions REST APIs.
+A lightweight library for dynamically generating descriptions REST APIs. Please see the wiki for an in-depth discussion. The rest of this page is a brief overview and quick start.
 
-Key features:
+Key features
+------------
 
 * Standards compliant. Generation of descriptions is based entirely on the annotations from the [JAX-RS 1.1 Specification](http://jsr311.java.net/) plus a single custom annotation.
 * Completely independent of any JAX-RS implementation.
@@ -40,7 +41,36 @@ Rastajax ships with some default servlets that you can hook in to your REST appl
 
 2) Hook the servlet(s) into your application web.xml:
 
-TODO
+```
+<context-param>
+    <param-name>rastajax.apipackages</param-name>
+    <param-value>your.rest.application.package1,your.rest.application.package2</param-value>
+</context-param>
+
+...
+
+<servlet>
+  <servlet-name>RastajaxHtml</servlet-name>
+  <servlet-class>com.kelveden.rastajax.servlet.DefaultHtmlServlet</servlet-class>
+</servlet>
+
+<servlet>
+  <servlet-name>RastajaxJson</servlet-name>
+  <servlet-class>com.kelveden.rastajax.servlet.DefaultJsonServlet</servlet-class>
+</servlet>
+
+...
+
+<servlet-mapping>
+  <servlet-name>RastajaxHtml</servlet-name>
+  <url-pattern>/resources.html</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>RastajaxJson</servlet-name>
+  <url-pattern>/resources.json</url-pattern>
+</servlet-mapping>
+```
 
 That's it! Now just browse to the servlets and see examples of your API described as JSON and HTML. You can continue using these servlets of course but you'll probably want something more sophisticated longer term. See [the wiki](https://github.com/kelveden/rastajax/wiki/Using-Rastajax) for more details on creating how to create your own Rastajax integration.
 
