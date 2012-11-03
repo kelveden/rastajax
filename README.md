@@ -42,5 +42,5 @@ Rastajax ships with some default servlets that you can hook in to your REST appl
 
 TODO
 
-That's it! Now just browse to the servlets from your API and see examples of your API described as JSON and HTML. You can continue using these servlets of course but you'll probably want something more sophisticated longer term. See [the wiki](https://github.com/kelveden/rastajax/wiki/Using-Rastajax) for more details on creating how to create your own Rastajax integration.
+That's it! Now just browse to the servlets and see examples of your API described as JSON and HTML. You can continue using these servlets of course but you'll probably want something more sophisticated longer term. See [the wiki](https://github.com/kelveden/rastajax/wiki/Using-Rastajax) for more details on creating how to create your own Rastajax integration.
 
