@@ -20,7 +20,7 @@ What's in the box
 Rastajax comes as 3 Maven artifacts:
 
 * _rastajax-core_: The core library. This is the minimum you will need to add to your REST application's classpath.
-* _rastajax-representation_: Contains the default REST API description representations supported by Rastajax. You can extend Rastajax with your own representations either in your own codebase or (even better!) to the _rastajax-representation_ library itself. See [the wiki](https://github.com/kelveden/rastajax/wiki/Extending-Rastajax) for more details.
+* _rastajax-representation_: Contains the default REST API description representations supported by Rastajax. You can extend Rastajax with your own representations either in your own codebase or (even better!) to the _rastajax-representation_ library itself. See [the wiki](https://github.com/kelveden/rastajax/wiki/How-It-Works) for more details.
 * _rastajax-servlet_: Contains the default servlets that you can use to quickly try out Rastajax. See the "Quick start" section below for more details.
 
 Quick start
