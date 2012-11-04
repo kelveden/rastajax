@@ -27,7 +27,8 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * {@link RootResourceScanner} that scans in all JAX-RS resources it can find directly from the specified packages pulled from the classpath.
+ * {@link RootResourceScanner} that scans in all <a href="http://jsr311.java.net/">JAX-RS</a> resources it can find
+ * directly from packages pulled in from a given {@link ClassLoader}.
  */
 public class ClassLoaderRootResourceScanner implements RootResourceScanner {
 
@@ -60,10 +61,15 @@ public class ClassLoaderRootResourceScanner implements RootResourceScanner {
         }
     }
 
+    /**
+     * Specifies that this {@link ClassLoaderRootResourceScanner} will allow inheritance of class-level JAX-RS annotations
+     * from an interface - contrary to the <a href="http://jsr311.java.net/">JAX-RS specification</a>. This is useful when dealing with JAX-RS implementations
+     * that also honour such behaviour - e.g. <a href="http://www.jboss.org/resteasy">JBoss RESTEasy</a>.
+     */
     public ClassLoaderRootResourceScanner allowInterfaceInheritance() {
         this.scanInterfaces = true;
 
-        LOGGER.info("JAX-RS annotations at class-level on interfaces will be honoured.");
+        LOGGER.info("JAX-RS annotations at class-level on interfaces will be honoured in inheriting classes.");
 
         return this;
     }
@@ -73,8 +79,8 @@ public class ClassLoaderRootResourceScanner implements RootResourceScanner {
         // This is a bit of short-cut really as it only checks for the presence of a URI template annotation on the class -
         // the JAX-RS specification also requires the class to have at least one method annotated with a request method designator
         // and/or URI template. However, given that the scenario where a class has the URI template but no REST methods is both unlikely
-        // and absurd, we can take that risk. The worst that will happen is that we do a little extra processing - the class won't
-        // loaded for representation anyway due to having no REST methods.
+        // and absurd, we can take that risk. The worst that will happen is that we do a little extra processing in the {@link ResourceClassLoader}
+        // - the class won't loaded for representation anyway due to having no REST methods.
 
         final Set<Class<?>> results = new HashSet<Class<?>>();
 

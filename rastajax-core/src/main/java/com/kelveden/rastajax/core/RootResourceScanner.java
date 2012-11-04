@@ -18,15 +18,17 @@ package com.kelveden.rastajax.core;
 import java.util.Set;
 
 /**
- * Implemented by classes providing the ability to scan for REST resources within a JAX-RS Application.
+ * Implemented by classes providing the ability to scan for root resources within a REST Application.
  */
 public interface RootResourceScanner {
 
     /**
-     * Scan for potential JAX-RS resources.
+     * Scan for potential root REST resources. It does not have to be 100% accurate - it is simply a way of narrowing down
+     * the number of classes that the {@link ResourceClassLoader} has to process. The {@link ResourceClassLoader} will discard
+     * any classes that turn out not to be root resource classes.
      *
      * @return
-     *      A {@link Set} of {@link Class}es that could potentially represent JAX-RS resources.
+     *      A {@link Set} of {@link Class}es that could potentially represent root REST resources.
      */
     Set<Class<?>> scan();
 }

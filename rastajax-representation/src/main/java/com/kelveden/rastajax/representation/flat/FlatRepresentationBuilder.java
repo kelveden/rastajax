@@ -33,8 +33,8 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
     private static final int UNDERLINE_LENGTH = 60;
     private static final Comparator<FlatResource> RESOURCE_COMPARATOR = new Comparator<FlatResource>() {
         @Override
-        public int compare(FlatResource o1, FlatResource o2) {
-            return o1.getUriTemplate().compareTo(o2.getUriTemplate());
+        public int compare(final FlatResource flatResource1, final FlatResource flatResource2) {
+            return flatResource1.getUriTemplate().compareTo(flatResource2.getUriTemplate());
         }
     };
 
@@ -52,7 +52,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
             LOGGER.debug("This resource is a root resource.");
             LOGGER.debug("Analyzing methods...");
 
-            final Map<String, List<ResourceClassMethod>> resourceClassMethodsByPath = groupResourceClassMethodsByUriTemplate(resourceClass, " |-");
+            final MultiValuedMap<String, ResourceClassMethod> resourceClassMethodsByPath = groupResourceClassMethodsByUriTemplate(resourceClass, " |-");
 
             final List<FlatResource> methodsAsResources = representResourceClassMethods(resourceClassMethodsByPath);
             result.addAll(methodsAsResources);
@@ -80,13 +80,13 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         return result;
     }
 
-    private MultiValuedMap groupResourceClassMethodsByUriTemplate(final ResourceClass resourceClass, final String logPrefix) {
+    private MultiValuedMap<String, ResourceClassMethod> groupResourceClassMethodsByUriTemplate(final ResourceClass resourceClass, final String logPrefix) {
 
         final MultiValuedMap<String, ResourceClassMethod> resourceClassMethodsByUriTemplate = new MultiValuedMap<String, ResourceClassMethod>();
 
         for (ResourceClassMethod resourceClassMethod : resourceClass.getMethods()) {
 
-            final String uriTemplate = buildResourceMethodFullUriTemplateFrom(resourceClass, resourceClassMethod);
+            final String uriTemplate = buildResourceMethodUriTemplateFrom(resourceClass, resourceClassMethod);
 
             LOGGER.debug("{} Found method '{}'.", logPrefix, resourceClassMethod.getName());
 
@@ -145,7 +145,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         return result;
     }
 
-    private String buildResourceMethodFullUriTemplateFrom(final ResourceClass resource, final ResourceClassMethod method) {
+    private String buildResourceMethodUriTemplateFrom(final ResourceClass resource, final ResourceClassMethod method) {
 
         String fullUriTemplateRoot = "";
         if (resource.getUriTemplate() != null) {
@@ -162,42 +162,41 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
             return resource.getUriTemplate();
 
         } else {
-            // Will never happen as the method types will never change (unless the JAX-RS spec changes perhaps...)
-            return null;
+            throw new UnsupportedOperationException("ResourceClassMethod of type '" + method.getClass().getName() + "' is not supported.");
         }
     }
 
-    private String representRequestMethodDesignator(ResourceClassMethod resourceClassMethod) {
+    private String representRequestMethodDesignator(final ResourceClassMethod resourceClassMethod) {
 
-        String requestMethodDesignator = null;
         if (resourceClassMethod instanceof SubResourceMethod) {
-            requestMethodDesignator = ((SubResourceMethod) resourceClassMethod).getRequestMethodDesignator()  ;
+            return ((SubResourceMethod) resourceClassMethod).getRequestMethodDesignator()  ;
 
         } else if (resourceClassMethod instanceof ResourceMethod) {
-            requestMethodDesignator = ((ResourceMethod) resourceClassMethod).getRequestMethodDesignator()  ;
-        }
+            return ((ResourceMethod) resourceClassMethod).getRequestMethodDesignator()  ;
 
-        return requestMethodDesignator;
+        } else {
+            throw new UnsupportedOperationException("A resource class method of type '" + resourceClassMethod.getClass().getName() + "' is not supported here. This most likely represents a bug in Rastjax.");
+        }
     }
 
-    private Map<String, List<FlatResourceMethodParameter>> representParameters(final List<ResourceClassMethodParameter> rawMethodParameters) {
+    private MultiValuedMap<String, FlatResourceMethodParameter> representParameters(final List<ResourceClassMethodParameter> resourceClassMethodParameters) {
 
         final MultiValuedMap<String, FlatResourceMethodParameter> parameters = new MultiValuedMap<String, FlatResourceMethodParameter>();
 
-        for (ResourceClassMethodParameter rawMethodParameter : rawMethodParameters) {
-            final String parameterType = toCamelCase(rawMethodParameter.getJaxRsAnnotationType().getSimpleName());
+        for (ResourceClassMethodParameter resourceClassMethodParameter : resourceClassMethodParameters) {
+            final String parameterType = toCamelCase(resourceClassMethodParameter.getJaxRsAnnotationType().getSimpleName());
 
-            parameters.putSingleValue(parameterType, new FlatResourceMethodParameter(rawMethodParameter.getName(), rawMethodParameter.getType().getSimpleName()));
+            parameters.putSingleValue(parameterType, new FlatResourceMethodParameter(resourceClassMethodParameter.getName(), resourceClassMethodParameter.getType().getSimpleName()));
         }
 
         return parameters;
     }
 
-    private List<FlatResource> representResourceClassMethods(final Map<String, List<ResourceClassMethod>> subResourceMethodsGroupedByPaths) {
+    private List<FlatResource> representResourceClassMethods(final MultiValuedMap<String, ResourceClassMethod> resourceClassMethodsByUriTemplate) {
 
         final List<FlatResource> result = new ArrayList<FlatResource>();
 
-        for (Map.Entry<String, List<ResourceClassMethod>> subResourceMethodsGroupedByPath : subResourceMethodsGroupedByPaths.entrySet()) {
+        for (Map.Entry<String, List<ResourceClassMethod>> subResourceMethodsGroupedByPath : resourceClassMethodsByUriTemplate.entrySet()) {
             final String uriTemplate = subResourceMethodsGroupedByPath.getKey();
 
             final List<FlatResourceMethod> flatResourceMethods = new ArrayList<FlatResourceMethod>();
@@ -211,26 +210,26 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         return result;
     }
 
-    private FlatResourceMethod representResourceClassMethod(final ResourceClassMethod rawMethod, final ResourceClass rawResource) {
+    private FlatResourceMethod representResourceClassMethod(final ResourceClassMethod resourceClassMethod, final ResourceClass resourceClass) {
 
-        final List<String> produces = representMediaTypeListForMethod(rawMethod.getProduces(), rawResource.getProduces());
-        final List<String> consumes = representMediaTypeListForMethod(rawMethod.getConsumes(), rawResource.getConsumes());
+        final List<String> produces = representMediaTypeListForMethod(resourceClassMethod.getProduces(), resourceClass.getProduces());
+        final List<String> consumes = representMediaTypeListForMethod(resourceClassMethod.getConsumes(), resourceClass.getConsumes());
 
-        final Map<String, List<FlatResourceMethodParameter>> parameters = representParameters(rawMethod.getParameters());
-        final String requestMethodDesignator = representRequestMethodDesignator(rawMethod);
+        final Map<String, List<FlatResourceMethodParameter>> parameters = representParameters(resourceClassMethod.getParameters());
+        final String requestMethodDesignator = representRequestMethodDesignator(resourceClassMethod);
 
-        String resourceClassName = null;
-        if (rawMethod instanceof SubResourceMethod) {
-            resourceClassName = rawResource.getRawClass().getName();
+        final String resourceClassName;
+        if (resourceClassMethod instanceof SubResourceMethod) {
+            resourceClassName = resourceClass.getRawClass().getName();
 
-        } else if (rawMethod instanceof ResourceMethod) {
-            resourceClassName = ((ResourceMethod) rawMethod).getRawResourceClass().getName();
+        } else if (resourceClassMethod instanceof ResourceMethod) {
+            resourceClassName = ((ResourceMethod) resourceClassMethod).getRawResourceClass().getName();
 
         } else {
-            LOGGER.warn("Unexpected method type '{}'.", rawMethod.getClass().getName());
+            throw new UnsupportedOperationException("A resource class method of type '" + resourceClassMethod.getClass().getName() + "' is not supported here. This most likely represents a bug in Rastjax.");
         }
 
-        return new FlatResourceMethod(rawMethod.getName(), requestMethodDesignator, parameters, consumes, produces, resourceClassName);
+        return new FlatResourceMethod(resourceClassMethod.getName(), requestMethodDesignator, parameters, consumes, produces, resourceClassName);
     }
 
     private FlatResource representResource(final String uriTemplate, final List<FlatResourceMethod> resourceMethods) {
@@ -284,6 +283,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
 
             if (raw == null) {
                 raw = new ArrayList<V>();
+
                 super.put((K) key, raw);
             }
 

@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Represents the raw data from a JAX-RS resource.
+ * Represents the raw data from a <a href="http://jsr311.java.net/">JAX-RS</a>  resource.
  */
 public final class ResourceClass {
 

@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Represents a public method on a {@link ResourceClass}.
+ * Represents a <a href="http://jsr311.java.net/">JAX-RS</a>  resource method, sub-resource method or sub-resource locator on a {@link ResourceClass}.
  */
 public abstract class ResourceClassMethod {
 

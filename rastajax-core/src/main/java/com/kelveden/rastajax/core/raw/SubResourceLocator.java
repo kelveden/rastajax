@@ -18,7 +18,7 @@ package com.kelveden.rastajax.core.raw;
 import java.util.List;
 
 /**
- * Represents a JAX-RS sub-resource locator.
+ * {@link ResourceClassMethod} representing a <a href="http://jsr311.java.net/">JAX-RS</a>  sub-resource locator.
  */
 public class SubResourceLocator extends ResourceClassMethod {
 

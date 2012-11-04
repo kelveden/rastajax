@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents the final "representable" version of resource method on a JAX-RS resource.
+ * Represents the final "representable" version of a resource method on a <a href="http://jsr311.java.net/">JAX-RS</a> resource.
  */
 public final class FlatResourceMethod {
 

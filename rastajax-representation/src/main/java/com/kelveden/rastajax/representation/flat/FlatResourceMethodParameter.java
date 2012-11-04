@@ -16,7 +16,8 @@
 package com.kelveden.rastajax.representation.flat;
 
 /**
- * Represents the final "representable" version of a parameter on a resource method of a JAX-RS resource.
+ * Represents the final "representable" version of a parameter on a resource method of a
+ * <a href="http://jsr311.java.net/">JAX-RS</a> resource.
  */
 public final class FlatResourceMethodParameter {
 

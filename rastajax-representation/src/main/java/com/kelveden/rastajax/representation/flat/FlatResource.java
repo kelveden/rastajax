@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Represents the final "representable" version of a JAX-RS resource.
+ * Represents the final "representable" version of a <a href="http://jsr311.java.net/">JAX-RS</a> resource.
  */
 public final class FlatResource {
 

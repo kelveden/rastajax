@@ -18,7 +18,7 @@ package com.kelveden.rastajax.core.raw;
 import java.util.List;
 
 /**
- * Represents a JAX-RS resource method.
+ * {@link ResourceClassMethod} representing a <a href="http://jsr311.java.net/">JAX-RS</a> resource method.
  */
 public final class ResourceMethod extends ResourceClassMethod {
 

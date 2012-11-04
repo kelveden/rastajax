@@ -30,6 +30,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 
+/**
+ * Example servlet showcasing a simple integration with Rastajax that will use the {@link FlatRepresentationBuilder} that ships with Rastajax to build a flat
+ * representation of a REST application that is then rendered as JSON. See the <a href="https://github.com/kelveden/rastajax">Rastajax Homepage</a> for more information.
+ */
 public class DefaultJsonServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;

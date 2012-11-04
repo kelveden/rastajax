@@ -20,7 +20,7 @@ import com.kelveden.rastajax.core.raw.ResourceClass;
 import java.util.Set;
 
 /**
- * Implemented by any class providing functionality to transform {@link com.kelveden.rastajax.core.raw.ResourceClass}s into a single final serializable
+ * Implemented by any class providing functionality to transform {@link com.kelveden.rastajax.core.raw.ResourceClass}es into a single final serializable
  * representation.
  *
  * @param <T>

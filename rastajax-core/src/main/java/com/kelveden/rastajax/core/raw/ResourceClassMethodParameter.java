@@ -18,7 +18,7 @@ package com.kelveden.rastajax.core.raw;
 import java.lang.annotation.Annotation;
 
 /**
- * Represents a raw single parameter from a JAX-RS resource method, sub-resource method or sub-resource locator.
+ * Represents a single parameter from a <a href="http://jsr311.java.net/">JAX-RS</a>  resource method, sub-resource method or sub-resource locator.
  */
 public final class ResourceClassMethodParameter {
 
