@@ -18,9 +18,15 @@ package com.kelveden.rastajax.core.raw;
 import java.lang.annotation.Annotation;
 
 /**
- * Represents a single parameter from a <a href="http://jsr311.java.net/">JAX-RS</a>  resource method, sub-resource method or sub-resource locator.
+ * Represents one out of:
+ *
+ * <ul>
+ * <li>a parameter from a <a href="http://jsr311.java.net/">JAX-RS</a>  resource method, sub-resource method or sub-resource locator.</li>
+ * <li>a field on a resource class that is injected via JAX-RS.</li>
+ * <li>a property on a resource class that is injected via JAX-RS.</li>
+ * </ul>
  */
-public final class ResourceClassMethodParameter {
+public final class Parameter {
 
     private final String name;
     private final Class<?> type;
@@ -36,7 +42,7 @@ public final class ResourceClassMethodParameter {
      * @param type
      *      The Java type of the parameter.
      */
-    public ResourceClassMethodParameter(final String name, final Class<? extends Annotation> jaxRsAnnotationType, final Class<?> type) {
+    public Parameter(final String name, final Class<? extends Annotation> jaxRsAnnotationType, final Class<?> type) {
         this.name = name;
         this.type = type;
         this.jaxRsAnnotationType = jaxRsAnnotationType;

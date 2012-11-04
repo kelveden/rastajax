@@ -239,7 +239,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -269,7 +269,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -305,7 +305,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -429,7 +429,6 @@ public class JaxRsAnnotationScraperTest {
     @Test
     public void parameterLevelAnnotationFromSuperClassIsIgnoredIfResourceClassHasParameterLevelAnnotationOfItsOwn() throws NoSuchMethodException {
 
-
         // Given
         final String superClassSource =
                 "import javax.ws.rs.*;" +
@@ -448,7 +447,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -459,7 +458,6 @@ public class JaxRsAnnotationScraperTest {
 
     @Test
     public void parameterLevelAnnotationFromInterfaceIsIgnoredIfResourceClassHasParameterLevelAnnotationOfItsOwn() throws NoSuchMethodException {
-
 
         // Given
         final String interfaceSource =
@@ -479,12 +477,57 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
                 Matchers.allOf(
                         annotationValueIs("classparam"),
                         annotationTypeIs(QueryParam.class))));
+    }
+
+    @Test
+    public void resourceClassFieldsAreScraped() throws NoSuchMethodException {
+//
+//        // Given
+//        final String resourceClassSource =
+//                "import javax.ws.rs.*;" +
+//                        "public class MyResourceClass {" +
+//                        "@PathParam(\"myparam\") String myParam; " +
+//                        "}";
+//
+//        final Class<?> compiledClass = compiler.compileFromSource(resourceClassSource);
+//        final Method method = compiledClass.getMethod("doSomething", String.class);
+//
+//        // When
+//        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrape(compiledClass, method, 0);
+//
+//        // Then
+//        assertThat(annotations, contains(
+//                Matchers.allOf(
+//                        annotationValueIs("classparam"),
+//                        annotationTypeIs(QueryParam.class))));
+    }
+
+    @Test
+    public void resourceClassPropertiesAreScrapedAsFields() {
+    }
+
+    @Test
+    public void resourceClassPropertiesFromInterfaceAreScraped() {
+    }
+
+    @Test
+    public void resourceClassPropertyFromInterfaceIsIgnoredIfResourceClassHasPropertyAnnotationOfItsOwn() {
+
+    }
+
+    @Test
+    public void resourceClassPropertiesFromSuperclassAreScraped() {
+    }
+
+    @Test
+    public void resourceClassPropertyFromSuperclassIsIgnoredIfResourceClassHasPropertyAnnotationOfItsOwn() {
+
     }
 }

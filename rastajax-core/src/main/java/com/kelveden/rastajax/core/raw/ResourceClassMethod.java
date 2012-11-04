@@ -26,10 +26,10 @@ public abstract class ResourceClassMethod {
     private final String name;
     private final List<String> consumes;
     private final List<String> produces;
-    private final List<ResourceClassMethodParameter> parameters;
+    private final List<Parameter> parameters;
     private ResourceClass resourceClass;
 
-    protected ResourceClassMethod(final String name, final List<String> consumes, final List<String> produces, final List<ResourceClassMethodParameter> parameters) {
+    protected ResourceClassMethod(final String name, final List<String> consumes, final List<String> produces, final List<Parameter> parameters) {
         this.name = name;
         this.consumes = Collections.unmodifiableList(consumes);
         this.produces = Collections.unmodifiableList(produces);
@@ -48,7 +48,7 @@ public abstract class ResourceClassMethod {
         return produces;
     }
 
-    public List<ResourceClassMethodParameter> getParameters() {
+    public List<Parameter> getParameters() {
         return parameters;
     }
 

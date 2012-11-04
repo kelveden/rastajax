@@ -179,11 +179,11 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         }
     }
 
-    private MultiValuedMap<String, FlatResourceMethodParameter> representParameters(final List<ResourceClassMethodParameter> resourceClassMethodParameters) {
+    private MultiValuedMap<String, FlatResourceMethodParameter> representParameters(final List<Parameter> resourceClassMethodParameters) {
 
         final MultiValuedMap<String, FlatResourceMethodParameter> parameters = new MultiValuedMap<String, FlatResourceMethodParameter>();
 
-        for (ResourceClassMethodParameter resourceClassMethodParameter : resourceClassMethodParameters) {
+        for (Parameter resourceClassMethodParameter : resourceClassMethodParameters) {
             final String parameterType = toCamelCase(resourceClassMethodParameter.getJaxRsAnnotationType().getSimpleName());
 
             parameters.putSingleValue(parameterType, new FlatResourceMethodParameter(resourceClassMethodParameter.getName(), resourceClassMethodParameter.getType().getSimpleName()));

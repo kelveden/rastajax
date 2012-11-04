@@ -31,7 +31,7 @@ public class ResourceMethodTest {
 
     private static final String DUMMY_NAME = "somename";
     private static final String DUMMY_REQUEST_METHOD_DESIGNATOR = "GET";
-    private static final List<ResourceClassMethodParameter> DUMMY_METHOD_PARAMETERS = new ArrayList<ResourceClassMethodParameter>();
+    private static final List<Parameter> DUMMY_METHOD_PARAMETERS = new ArrayList<Parameter>();
     private static final List<String> DUMMY_PRODUCES = new ArrayList<String>();
     private static final List<String> DUMMY_CONSUMES = new ArrayList<String>();
     private static final Class<?> DUMMY_RETURN_TYPE = String.class;
@@ -122,7 +122,7 @@ public class ResourceMethodTest {
         resourceMethod.getParameters().add(dummyParameter());
     }
 
-    private ResourceClassMethodParameter dummyParameter() {
-        return new ResourceClassMethodParameter("somename", QueryParam.class, String.class);
+    private Parameter dummyParameter() {
+        return new Parameter("somename", QueryParam.class, String.class);
     }
 }

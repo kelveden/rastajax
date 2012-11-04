@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -34,14 +35,6 @@ class ResourceClassLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceClassLoader.class);
     private static final int UNDERLINE_LENGTH = 60;
-
-    private static final Set<Class<? extends Annotation>> PARAMETER_ANNOTATION_TYPES = new HashSet<Class<? extends Annotation>>() { {
-        add(FormParam.class);
-        add(PathParam.class);
-        add(QueryParam.class);
-        add(MatrixParam.class);
-        add(HeaderParam.class);
-    } };
 
     public ResourceClass loadResourceClassFrom(final Class<?> candidateResourceClass) {
 
@@ -76,7 +69,7 @@ class ResourceClassLoader {
 
         LOGGER.debug("Finding resource methods...");
 
-        final List<ResourceClassMethod> methodsOnResource = loadMethodsFrom(candidateResourceClass);
+        final List<ResourceClassMethod> methodsOnResource = loadMethods(candidateResourceClass);
         LOGGER.debug("Found {} resource methods.", methodsOnResource.size());
 
         if (methodsOnResource.size() == 0) {
@@ -87,7 +80,79 @@ class ResourceClassLoader {
 
         LOGGER.debug("Class is a resource class.");
 
-        return new ResourceClass(candidateResourceClass, uriTemplate, methodsOnResource, arrayAsList(consumes), arrayAsList(produces));
+        final List<Parameter> fields = loadClassFields(candidateResourceClass);
+        LOGGER.debug("Found {} fields.", fields.size());
+
+        final List<Parameter> properties = loadClassProperties(candidateResourceClass);
+        LOGGER.debug("Found {} properties that will be treated as fields.", properties.size());
+
+        fields.addAll(properties);
+
+        return new ResourceClass(candidateResourceClass, uriTemplate, methodsOnResource, arrayAsList(consumes), arrayAsList(produces), fields);
+    }
+
+    private List<Parameter> loadClassFields(final Class<?> resourceClass) {
+
+        final String logPrefix = " |-";
+
+        final List<Parameter> fields = new ArrayList<Parameter>();
+
+        for (Field field : resourceClass.getFields()) {
+            final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(field);
+
+            try {
+                final Parameter parameter = buildParameterFromJaxRsAnnotations(annotations, field.getType());
+
+                if (parameter != null) {
+                    LOGGER.debug("{} Found {} field '{}' of type '{}'.", logPrefix, parameter.getJaxRsAnnotationType().getSimpleName(), parameter.getName(), parameter.getType().getName());
+
+                    fields.add(parameter);
+                }
+
+            } catch (IllegalAccessException e) {
+                throw new ResourceClassLoadingException(String.format("Could not load field '%s' on class '%s'", field.getName(), resourceClass.getName()), e);
+
+            } catch (InvocationTargetException e) {
+                throw new ResourceClassLoadingException(String.format("Could not load field '%s' on class '%s'", field.getName(), resourceClass.getName()), e);
+
+            } catch (NoSuchMethodException e) {
+                throw new ResourceClassLoadingException(String.format("Could not load field '%s' on class '%s'", field.getName(), resourceClass.getName()), e);
+            }
+        }
+
+        return fields;
+    }
+
+    private List<Parameter> loadClassProperties(final Class<?> resourceClass) {
+
+        final String logPrefix = " |-";
+
+        final List<Parameter> fields = new ArrayList<Parameter>();
+
+        for (Method method : resourceClass.getDeclaredMethods()) {
+            final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(resourceClass, method);
+
+            try {
+                final Parameter parameter = buildParameterFromJaxRsAnnotations(annotations, method.getReturnType());
+
+                if (parameter != null) {
+                    LOGGER.debug("{} Found {} property '{}' of type '{}'.", logPrefix, parameter.getJaxRsAnnotationType().getSimpleName(), parameter.getName(), parameter.getType().getName());
+
+                    fields.add(parameter);
+                }
+
+            } catch (IllegalAccessException e) {
+                throw new ResourceClassLoadingException(String.format("Could not load property '%s' on class '%s'", method.getName(), resourceClass.getName()), e);
+
+            } catch (InvocationTargetException e) {
+                throw new ResourceClassLoadingException(String.format("Could not load property '%s' on class '%s'", method.getName(), resourceClass.getName()), e);
+
+            } catch (NoSuchMethodException e) {
+                throw new ResourceClassLoadingException(String.format("Could not load property'%s' on class '%s'", method.getName(), resourceClass.getName()), e);
+            }
+        }
+
+        return fields;
     }
 
     private List<String> arrayAsList(final String[] array) {
@@ -99,7 +164,7 @@ class ResourceClassLoader {
         return new ArrayList<String>();
     }
 
-    private List<ResourceClassMethod> loadMethodsFrom(final Class<?> candidateResourceClass) {
+    private List<ResourceClassMethod> loadMethods(final Class<?> candidateResourceClass) {
 
         final List<ResourceClassMethod> methodsOnResource = new ArrayList<ResourceClassMethod>();
 
@@ -107,7 +172,7 @@ class ResourceClassLoader {
 
         for (Method method : methods) {
             if (Modifier.isPublic(method.getModifiers())) {
-                final ResourceClassMethod methodOnResource = loadMethodFrom(candidateResourceClass, method);
+                final ResourceClassMethod methodOnResource = loadMethod(candidateResourceClass, method);
 
                 if (methodOnResource != null) {
                     methodsOnResource.add(methodOnResource);
@@ -118,7 +183,7 @@ class ResourceClassLoader {
         return methodsOnResource;
     }
 
-    private ResourceClassMethod loadMethodFrom(final Class<?> candidateResourceClass, final Method method) {
+    private ResourceClassMethod loadMethod(final Class<?> candidateResourceClass, final Method method) {
 
         final String logPrefix = " |-";
 
@@ -171,62 +236,75 @@ class ResourceClassLoader {
         LOGGER.debug("{} Method is a resource method.", logPrefix);
         LOGGER.debug("{} Finding method parameters...", logPrefix);
 
-        final List<ResourceClassMethodParameter> parameters = loadMethodParameters(candidateResourceClass, method);
+        final List<Parameter> parameters = loadMethodParameters(candidateResourceClass, method);
 
-        return createResourceClassMethod(candidateResourceClass, method, uriTemplate, requestMethodDesignator, arrayAsList(consumes), arrayAsList(produces), parameters);
+        return createResourceClassMethod(method, uriTemplate, requestMethodDesignator, arrayAsList(consumes), arrayAsList(produces), parameters);
     }
 
-    private List<ResourceClassMethodParameter> loadMethodParameters(Class<?> resourceClass, Method method) {
+    private List<Parameter> loadMethodParameters(Class<?> resourceClass, Method method) {
 
-        final List<ResourceClassMethodParameter> parameters = new ArrayList<ResourceClassMethodParameter>();
+        final String logPrefix = " |-";
+
+        final List<Parameter> parameters = new ArrayList<Parameter>();
 
         final Class<?>[] parameterTypes = method.getParameterTypes();
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            final ResourceClassMethodParameter parameter = loadMethodParameter(resourceClass, method, i);
+            final Parameter parameter = loadMethodParameter(resourceClass, method, i);
 
             if (parameter != null) {
+                LOGGER.debug("{} Found {} parameter '{}' of type '{}'.", logPrefix, parameter.getJaxRsAnnotationType().getSimpleName(), parameter.getName(), parameter.getType().getName());
+
                 parameters.add(parameter);
             }
         }
         return parameters;
     }
 
-    private ResourceClassMethodParameter loadMethodParameter(final Class<?> clazz, final Method method, final int parameterIndex) {
+    private Parameter loadMethodParameter(final Class<?> clazz, final Method method, final int parameterIndex) {
 
         final String logPrefix = " |---";
 
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(clazz, method, parameterIndex);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(clazz, method, parameterIndex);
         LOGGER.debug("{} Found parameter annotations {}.", logPrefix, annotations.toString());
 
+        final Class<?> type = method.getParameterTypes()[parameterIndex];
+
+        try {
+            return buildParameterFromJaxRsAnnotations(annotations, type);
+
+        } catch (IllegalAccessException e) {
+            throw new ResourceClassLoadingException(String.format("Could not load resource method parameter at index %s on method '%s' on class '%s'", parameterIndex, method.getName(), clazz.getName()), e);
+
+        } catch (InvocationTargetException e) {
+            throw new ResourceClassLoadingException(String.format("Could not load resource method parameter at index %s on method '%s' on class '%s'", parameterIndex, method.getName(), clazz.getName()), e);
+
+        } catch (NoSuchMethodException e) {
+            throw new ResourceClassLoadingException(String.format("Could not load resource method parameter at index %s on method '%s' on class '%s'", parameterIndex, method.getName(), clazz.getName()), e);
+        }
+    }
+
+    private Parameter buildParameterFromJaxRsAnnotations(final Set<Annotation> annotations, final Class<?> parameterType) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+        Class<? extends Annotation> parameterAnnotationType = null;
+        String parameterName = null;
+
         for (Annotation annotation : annotations) {
-            final Class<? extends Annotation> parameterType = annotation.annotationType();
-            final Class<?> type = method.getParameterTypes()[parameterIndex];
-
-            if (PARAMETER_ANNOTATION_TYPES.contains(annotation.annotationType())) {
-                try {
-                    final String name = (String) annotation.annotationType().getMethod("value").invoke(annotation);
-
-                    LOGGER.debug("{} Found {} parameter '{}' of type '{}'.", parameterType, name, type);
-
-                    return new ResourceClassMethodParameter(name, parameterType, type);
-
-                } catch (IllegalAccessException e) {
-                    throw new ResourceClassLoadingException(String.format("Could not load resource method parameter at index %s on method '%s' on class '%s'", parameterIndex, method.getName(), clazz.getName()), e);
-
-                } catch (InvocationTargetException e) {
-                    throw new ResourceClassLoadingException(String.format("Could not load resource method parameter at index %s on method '%s' on class '%s'", parameterIndex, method.getName(), clazz.getName()), e);
-
-                } catch (NoSuchMethodException e) {
-                    throw new ResourceClassLoadingException(String.format("Could not load resource method parameter at index %s on method '%s' on class '%s'", parameterIndex, method.getName(), clazz.getName()), e);
-                }
+            if (JaxRsAnnotationScraper.PARAMETER_ANNOTATION_TYPES.contains(annotation.annotationType())) {
+                parameterAnnotationType = annotation.annotationType();
+                parameterName = (String) annotation.annotationType().getMethod("value").invoke(annotation);
             }
         }
 
-        return null;
+        if ((parameterName != null) && (parameterAnnotationType != null)) {
+            return new Parameter(parameterName, parameterAnnotationType, parameterType);
+
+        } else {
+            return null;
+        }
     }
 
-    private ResourceClassMethod createResourceClassMethod(final Class<?> resourceClass, final Method method, final String uriTemplate, final String requestMethodDesignator, final List<String> consumes, final List<String> produces, final List<ResourceClassMethodParameter> parameters) {
+    private ResourceClassMethod createResourceClassMethod(final Method method, final String uriTemplate, final String requestMethodDesignator, final List<String> consumes, final List<String> produces, final List<Parameter> parameters) {
 
         final boolean hasPath = (uriTemplate != null);
         final boolean hasRequestMethodDesignator = (requestMethodDesignator != null);

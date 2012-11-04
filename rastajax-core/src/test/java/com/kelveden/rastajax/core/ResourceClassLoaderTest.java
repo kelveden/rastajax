@@ -523,7 +523,7 @@ public class ResourceClassLoaderTest {
     }
 
     @Test
-    public void methodParameterQueryParamIsLoaded() {
+    public void methodQueryParamIsLoaded() {
 
         // Given
         final String source =
@@ -545,7 +545,7 @@ public class ResourceClassLoaderTest {
     }
 
     @Test
-    public void methodParameterFormParamIsLoaded() {
+    public void methodFormParamIsLoaded() {
 
         // Given
         final String source =
@@ -567,7 +567,7 @@ public class ResourceClassLoaderTest {
     }
 
     @Test
-    public void methodParameterHeaderParamIsLoaded() {
+    public void methodHeaderParamIsLoaded() {
 
         // Given
         final String source =
@@ -589,7 +589,7 @@ public class ResourceClassLoaderTest {
     }
 
     @Test
-    public void methodParameterMatrixParamIsLoaded() {
+    public void methodMatrixParamIsLoaded() {
 
         // Given
         final String source =
@@ -611,7 +611,7 @@ public class ResourceClassLoaderTest {
     }
 
     @Test
-    public void methodParameterPathParamIsLoaded() {
+    public void methodPathParamIsLoaded() {
 
         // Given
         final String source =
@@ -629,6 +629,28 @@ public class ResourceClassLoaderTest {
         // Then
         MatcherAssert.assertThat(resource.getMethods().get(0).getParameters().get(0).getName(), is("myparam"));
         MatcherAssert.assertThat(resource.getMethods().get(0).getParameters().get(0).getJaxRsAnnotationType().getSimpleName(), is("PathParam"));
+        MatcherAssert.assertThat(resource.getMethods().get(0).getParameters().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void methodCookieParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@GET public void someMethod(@CookieParam(\"myparam\") final String param) { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getMethods().get(0).getParameters().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getMethods().get(0).getParameters().get(0).getJaxRsAnnotationType().getSimpleName(), is("CookieParam"));
         MatcherAssert.assertThat(resource.getMethods().get(0).getParameters().get(0).getType().getSimpleName(), is("String"));
     }
 
@@ -690,5 +712,281 @@ public class ResourceClassLoaderTest {
 
         // Then
         MatcherAssert.assertThat(resource.getMethods().get(0), is(instanceOf(SubResourceLocator.class)));
+    }
+
+    @Test
+    public void fieldQueryParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@QueryParam(\"myparam\") public String someField; " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("QueryParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void fieldFormParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@FormParam(\"myparam\") public String someField; " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When    y
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("FormParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void fieldHeaderParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@HeaderParam(\"myparam\") public String someField; " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("HeaderParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void fieldMatrixParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@MatrixParam(\"myparam\") public String someField; " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("MatrixParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void fieldPathParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@PathParam(\"myparam\") public String someField; " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("PathParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void fieldCookieParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@CookieParam(\"myparam\") public String someField; " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("CookieParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void propertyQueryParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@QueryParam(\"myparam\") public String getMyField() { return \"\"; } " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("QueryParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void propertyFormParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@FormParam(\"myparam\") public String getMyField() { return \"\"; } " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("FormParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void propertyHeaderParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@HeaderParam(\"myparam\") public String getMyField() { return \"\"; } " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("HeaderParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void propertyMatrixParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@MatrixParam(\"myparam\") public String getMyField() { return \"\"; } " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("MatrixParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void propertyPathParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@PathParam(\"myparam\") public String getMyField() { return \"\"; } " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("PathParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
+    }
+
+    @Test
+    public void propertyCookieParamIsLoaded() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@CookieParam(\"myparam\") public String getMyField() { return \"\"; } " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields().get(0).getName(), is("myparam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getJaxRsAnnotationType().getSimpleName(), is("CookieParam"));
+        MatcherAssert.assertThat(resource.getFields().get(0).getType().getSimpleName(), is("String"));
     }
 }

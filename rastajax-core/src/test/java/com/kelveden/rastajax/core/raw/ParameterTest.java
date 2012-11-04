@@ -25,7 +25,7 @@ import java.lang.annotation.Annotation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class ResourceClassMethodParameterTest {
+public class ParameterTest {
 
     private static final String DUMMY_NAME = "somename";
     private static final Class<?> DUMMY_TYPE = String.class;
@@ -33,13 +33,13 @@ public class ResourceClassMethodParameterTest {
 
     @Test
     public void canInstantiate() {
-        new ResourceClassMethodParameter(DUMMY_NAME, DUMMY_PARAMETER_TYPE, DUMMY_TYPE);
+        new Parameter(DUMMY_NAME, DUMMY_PARAMETER_TYPE, DUMMY_TYPE);
     }
 
     @Test
     public void nameIsLoaded() {
 
-        final ResourceClassMethodParameter parameter = new ResourceClassMethodParameter("myname", DUMMY_PARAMETER_TYPE, DUMMY_TYPE);
+        final Parameter parameter = new Parameter("myname", DUMMY_PARAMETER_TYPE, DUMMY_TYPE);
 
         assertThat(parameter.getName(), is("myname"));
     }
@@ -47,7 +47,7 @@ public class ResourceClassMethodParameterTest {
     @Test
     public void typeIsLoaded() {
 
-        final ResourceClassMethodParameter parameter = new ResourceClassMethodParameter(DUMMY_NAME, DUMMY_PARAMETER_TYPE, Integer.class);
+        final Parameter parameter = new Parameter(DUMMY_NAME, DUMMY_PARAMETER_TYPE, Integer.class);
 
         assertThat(parameter.getType().getName(), is("java.lang.Integer"));
     }
@@ -55,7 +55,7 @@ public class ResourceClassMethodParameterTest {
     @Test
     public void parameterTypeIsLoaded() {
 
-        final ResourceClassMethodParameter parameter = new ResourceClassMethodParameter(DUMMY_NAME, FormParam.class, DUMMY_TYPE);
+        final Parameter parameter = new Parameter(DUMMY_NAME, FormParam.class, DUMMY_TYPE);
 
         assertThat(parameter.getJaxRsAnnotationType().getName(), is("javax.ws.rs.FormParam"));
     }

@@ -31,11 +31,12 @@ public class SubResourceLocatorTest {
 
     private static final String DUMMY_NAME = "somename";
     private static final String DUMMY_PATH = "somepath";
-    private static final List<ResourceClassMethodParameter> DUMMY_METHOD_PARAMETERS = new ArrayList<ResourceClassMethodParameter>();
+    private static final List<Parameter> DUMMY_METHOD_PARAMETERS = new ArrayList<Parameter>();
     private static final List<String> DUMMY_PRODUCES = new ArrayList<String>();
     private static final List<String> DUMMY_CONSUMES = new ArrayList<String>();
     private static final Class<?> DUMMY_RAW_CLASS = String.class;
-    private static final ResourceClass DUMMY_SUB_RESOURCE = new ResourceClass(DUMMY_RAW_CLASS, "/some/path", new ArrayList<ResourceClassMethod>(), DUMMY_PRODUCES, DUMMY_CONSUMES);
+    private static final ResourceClass DUMMY_SUB_RESOURCE = new ResourceClass(DUMMY_RAW_CLASS, "/some/path",
+            new ArrayList<ResourceClassMethod>(), DUMMY_PRODUCES, DUMMY_CONSUMES, new ArrayList<Parameter>());
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -64,7 +65,7 @@ public class SubResourceLocatorTest {
     @Test
     public void subResourceIsLoaded() {
 
-        final ResourceClass subResource = new ResourceClass(DUMMY_RAW_CLASS, "/my/path", new ArrayList<ResourceClassMethod>(), DUMMY_PRODUCES, DUMMY_CONSUMES);
+        final ResourceClass subResource = new ResourceClass(DUMMY_RAW_CLASS, "/my/path", new ArrayList<ResourceClassMethod>(), DUMMY_PRODUCES, DUMMY_CONSUMES, new ArrayList<Parameter>());
         final SubResourceLocator subResourceLocator = new SubResourceLocator(DUMMY_NAME, DUMMY_PATH, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, subResource);
 
         assertThat(subResourceLocator.getSubResource(), is(sameInstance(subResource)));
@@ -124,7 +125,7 @@ public class SubResourceLocatorTest {
         subResourceLocator.getParameters().add(dummyParameter());
     }
 
-    private ResourceClassMethodParameter dummyParameter() {
-        return new ResourceClassMethodParameter("somename", QueryParam.class, String.class);
+    private Parameter dummyParameter() {
+        return new Parameter("somename", QueryParam.class, String.class);
     }
 }

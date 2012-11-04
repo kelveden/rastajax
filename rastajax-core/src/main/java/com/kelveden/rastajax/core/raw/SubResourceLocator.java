@@ -25,7 +25,7 @@ public class SubResourceLocator extends ResourceClassMethod {
     private final String uriTemplate;
     private final ResourceClass subResource;
 
-    public SubResourceLocator(final String name, final String uriTemplate, final List<String> consumes, final List<String> produces, final List<ResourceClassMethodParameter> parameters, final ResourceClass subResource) {
+    public SubResourceLocator(final String name, final String uriTemplate, final List<String> consumes, final List<String> produces, final List<Parameter> parameters, final ResourceClass subResource) {
         super(name, consumes, produces, parameters);
 
         this.uriTemplate = uriTemplate;

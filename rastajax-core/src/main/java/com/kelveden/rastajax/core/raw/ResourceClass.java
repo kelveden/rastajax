@@ -28,8 +28,9 @@ public final class ResourceClass {
     private final List<ResourceClassMethod> methods;
     private final List<String> consumes;
     private final List<String> produces;
+    private final List<Parameter> fields;
 
-    public ResourceClass(final Class<?> rawClass, final String uriTemplate, final List<ResourceClassMethod> methods, final List<String> consumes, final List<String> produces) {
+    public ResourceClass(final Class<?> rawClass, final String uriTemplate, final List<ResourceClassMethod> methods, final List<String> consumes, final List<String> produces, final List<Parameter> fields) {
         this.rawClass = rawClass;
         this.uriTemplate = uriTemplate;
 
@@ -40,6 +41,7 @@ public final class ResourceClass {
         this.methods = Collections.unmodifiableList(methods);
         this.consumes = Collections.unmodifiableList(consumes);
         this.produces = Collections.unmodifiableList(produces);
+        this.fields = Collections.unmodifiableList(fields);
     }
 
     public String getUriTemplate() {
@@ -64,5 +66,9 @@ public final class ResourceClass {
 
     public Class<?> getRawClass() {
         return rawClass;
+    }
+
+    public List<Parameter> getFields() {
+        return fields;
     }
 }

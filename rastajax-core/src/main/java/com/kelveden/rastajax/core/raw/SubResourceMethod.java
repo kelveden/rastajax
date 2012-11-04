@@ -26,7 +26,7 @@ public final class SubResourceMethod extends ResourceClassMethod {
     private final String requestMethodDesignator;
     private final Class<?> returnType;
 
-    public SubResourceMethod(final String name, final String uriTemplate, final String requestMethodDesignator, final List<String> consumes, final List<String> produces, final List<ResourceClassMethodParameter> parameters, final Class<?> returnType) {
+    public SubResourceMethod(final String name, final String uriTemplate, final String requestMethodDesignator, final List<String> consumes, final List<String> produces, final List<Parameter> parameters, final Class<?> returnType) {
         super(name, consumes, produces, parameters);
 
         this.uriTemplate = uriTemplate;
