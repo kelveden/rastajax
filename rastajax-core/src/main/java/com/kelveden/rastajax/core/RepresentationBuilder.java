@@ -31,18 +31,18 @@ public interface RepresentationBuilder<T> {
     /**
      * Transforms the specified {@link com.kelveden.rastajax.core.raw.ResourceClass}es into a final representation.
      *
-     * @param rawResources
+     * @param resourceClasses
      *         The {@link com.kelveden.rastajax.core.raw.ResourceClass}s to transform.
      * @return The representation of the resources.
      */
-    T buildRepresentationFor(Set<ResourceClass> rawResources);
+    T buildRepresentationFor(Set<ResourceClass> resourceClasses);
 
     /**
      * Transforms the specified {@link com.kelveden.rastajax.core.raw.ResourceClass} into a final representation.
      *
-     * @param rawResource
+     * @param resourceClass
      *         The {@link com.kelveden.rastajax.core.raw.ResourceClass} to transform.
      * @return The representation of the resource.
      */
-    T buildRepresentationFor(ResourceClass rawResource);
+    T buildRepresentationFor(ResourceClass resourceClass);
 }
