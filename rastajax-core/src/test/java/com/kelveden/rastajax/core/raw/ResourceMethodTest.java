@@ -35,20 +35,19 @@ public class ResourceMethodTest {
     private static final List<String> DUMMY_PRODUCES = new ArrayList<String>();
     private static final List<String> DUMMY_CONSUMES = new ArrayList<String>();
     private static final Class<?> DUMMY_RETURN_TYPE = String.class;
-    private static final Class<?> DUMMY_RESOURCE_CLASS = String.class;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void canInstantiate() {
-        new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE);
     }
 
     @Test
     public void requestMethodDesignatorIsLoaded() {
 
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, "myrequestmethoddesignator", DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, "myrequestmethoddesignator", DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE);
 
         assertThat(resourceMethod.getRequestMethodDesignator(), is("myrequestmethoddesignator"));
     }
@@ -56,7 +55,7 @@ public class ResourceMethodTest {
     @Test
     public void nameIsLoaded() {
 
-        final ResourceMethod resourceMethod = new ResourceMethod("myname", DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod("myname", DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE);
 
         assertThat(resourceMethod.getName(), is("myname"));
     }
@@ -64,23 +63,15 @@ public class ResourceMethodTest {
     @Test
     public void returnTypeIsLoaded() {
 
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, Integer.class, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, Integer.class);
 
         assertThat(resourceMethod.getReturnType().getName(), is("java.lang.Integer"));
     }
 
     @Test
-    public void resourceClassIsLoaded() {
-
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, Integer.class);
-
-        assertThat(resourceMethod.getRawResourceClass().getName(), is("java.lang.Integer"));
-    }
-
-    @Test
     public void producesIsLoaded() {
 
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, Arrays.asList("produces1", "produces2"), DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, Arrays.asList("produces1", "produces2"), DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE);
 
         assertThat(resourceMethod.getProduces(), contains("produces1", "produces2"));
     }
@@ -90,7 +81,7 @@ public class ResourceMethodTest {
 
         thrown.expect(UnsupportedOperationException.class);
 
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE);
 
         resourceMethod.getProduces().add("produces");
     }
@@ -98,7 +89,7 @@ public class ResourceMethodTest {
     @Test
     public void consumesIsLoaded() {
 
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, Arrays.asList("consumes1", "consumes2"), DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, Arrays.asList("consumes1", "consumes2"), DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE);
 
         assertThat(resourceMethod.getConsumes(), contains("consumes1", "consumes2"));
     }
@@ -108,7 +99,7 @@ public class ResourceMethodTest {
 
         thrown.expect(UnsupportedOperationException.class);
 
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE);
 
         resourceMethod.getConsumes().add("consumes");
     }
@@ -116,7 +107,7 @@ public class ResourceMethodTest {
     @Test
     public void methodParametersAreLoaded() {
 
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, Arrays.asList(dummyParameter(), dummyParameter()), DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, Arrays.asList(dummyParameter(), dummyParameter()), DUMMY_RETURN_TYPE);
 
         assertThat(resourceMethod.getParameters(), hasSize(2));
     }
@@ -126,7 +117,7 @@ public class ResourceMethodTest {
 
         thrown.expect(UnsupportedOperationException.class);
 
-        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceMethod resourceMethod = new ResourceMethod(DUMMY_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_METHOD_PARAMETERS, DUMMY_RETURN_TYPE);
 
         resourceMethod.getParameters().add(dummyParameter());
     }

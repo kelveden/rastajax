@@ -44,7 +44,7 @@ public class FlatRepresentationBuilderTest {
 
     private static final Class<?> NO_RETURN_TYPE = null;
     private static final Class<?> DUMMY_RESOURCE_CLASS = String.class;
-    private static final ResourceClassMethod DUMMY_METHOD = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+    private static final ResourceClassMethod DUMMY_METHOD = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE);
 
     @Test
     public void canInstantiate() {
@@ -68,7 +68,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, NO_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -81,7 +81,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS) ;
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE) ;
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, "///my//path", Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -146,7 +146,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod("mymethod", DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS) ;
+        final ResourceClassMethod method = new ResourceMethod("mymethod", DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE) ;
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -161,8 +161,8 @@ public class FlatRepresentationBuilderTest {
         final Class<?> expectedRawClass = Integer.class;
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod("mymethod", DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE, expectedRawClass) ;
-        final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
+        final ResourceClassMethod method = new ResourceMethod("mymethod", DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE) ;
+        final ResourceClass resource = new ResourceClass(expectedRawClass, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
 
@@ -174,7 +174,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod resourceMethod = new ResourceMethod("mymethod", "POST", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS) ;
+        final ResourceClassMethod resourceMethod = new ResourceMethod("mymethod", "POST", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE) ;
         final ResourceClass subResource = new ResourceClass(DUMMY_RESOURCE_CLASS, NO_PATH, Arrays.asList(resourceMethod), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final ResourceClassMethod subResourceLocator = new SubResourceLocator(DUMMY_METHOD_NAME, "my/subresource/path", DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_PARAMETERS, subResource) ;
@@ -194,7 +194,7 @@ public class FlatRepresentationBuilderTest {
         final Class<?> subResourceClass = Integer.class;
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod resourceMethod = new ResourceMethod("mymethod", "POST", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE, subResourceClass) ;
+        final ResourceClassMethod resourceMethod = new ResourceMethod("mymethod", "POST", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE) ;
         final ResourceClass subResource = new ResourceClass(subResourceClass, NO_PATH, Arrays.asList(resourceMethod), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final ResourceClassMethod subResourceLocator = new SubResourceLocator(DUMMY_METHOD_NAME, "my/subresource/path", DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_PARAMETERS, subResource) ;
@@ -210,9 +210,9 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod resourceMethod1 = new ResourceMethod("mymethod1", "POST", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS) ;
+        final ResourceClassMethod resourceMethod1 = new ResourceMethod("mymethod1", "POST", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE) ;
         final ResourceClass subResource1 = new ResourceClass(DUMMY_RESOURCE_CLASS, NO_PATH, Arrays.asList(resourceMethod1), DUMMY_CONSUMES, DUMMY_PRODUCES);
-        final ResourceClassMethod resourceMethod2 = new ResourceMethod("mymethod2", "PUT", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS) ;
+        final ResourceClassMethod resourceMethod2 = new ResourceMethod("mymethod2", "PUT", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE) ;
         final ResourceClass subResource2 = new ResourceClass(DUMMY_RESOURCE_CLASS, NO_PATH, Arrays.asList(resourceMethod2), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final ResourceClassMethod subResourceLocator1 = new SubResourceLocator(DUMMY_METHOD_NAME, "my/subresource/path", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, subResource1) ;
@@ -249,7 +249,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, Arrays.asList(expectedConsumes), DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, Arrays.asList(expectedConsumes), DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -265,7 +265,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, Arrays.asList(expectedConsumes), DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, Arrays.asList(expectedConsumes), DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), Arrays.asList(classLevelConsumes), DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -294,7 +294,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, Arrays.asList(expectedProduces), DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, Arrays.asList(expectedProduces), DUMMY_PARAMETERS, NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -310,7 +310,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, Arrays.asList(expectedProduces), DUMMY_PARAMETERS, NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, Arrays.asList(expectedProduces), DUMMY_PARAMETERS, NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, Arrays.asList(classLevelProduces));
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -326,7 +326,7 @@ public class FlatRepresentationBuilderTest {
         final ResourceClassMethodParameter param1 = new ResourceClassMethodParameter("param1", QueryParam.class, String.class);
         final ResourceClassMethodParameter param2 = new ResourceClassMethodParameter("param2", QueryParam.class, String.class);
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, Arrays.asList(param1, param2), NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, Arrays.asList(param1, param2), NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -343,7 +343,7 @@ public class FlatRepresentationBuilderTest {
         final ResourceClassMethodParameter param1 = new ResourceClassMethodParameter("param1", QueryParam.class, String.class);
         final ResourceClassMethodParameter param2 = new ResourceClassMethodParameter("param2", QueryParam.class, Integer.class);
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, Arrays.asList(param1, param2), NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, Arrays.asList(param1, param2), NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -361,7 +361,7 @@ public class FlatRepresentationBuilderTest {
         final ResourceClassMethodParameter param2 = new ResourceClassMethodParameter("param2", FormParam.class, String.class);
         final ResourceClassMethodParameter param3 = new ResourceClassMethodParameter("param3", FormParam.class, String.class);
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, Arrays.asList(param1, param2, param3), NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, Arrays.asList(param1, param2, param3), NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
@@ -375,7 +375,7 @@ public class FlatRepresentationBuilderTest {
 
         final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
 
-        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, new ArrayList<ResourceClassMethodParameter>(), NO_RETURN_TYPE, DUMMY_RESOURCE_CLASS);
+        final ResourceClassMethod method = new ResourceMethod(DUMMY_METHOD_NAME, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_PRODUCES, DUMMY_CONSUMES, new ArrayList<ResourceClassMethodParameter>(), NO_RETURN_TYPE);
         final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, DUMMY_PATH, Arrays.asList(method), DUMMY_CONSUMES, DUMMY_PRODUCES);
 
         final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));

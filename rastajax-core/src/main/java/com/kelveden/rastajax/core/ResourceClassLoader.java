@@ -247,7 +247,7 @@ class ResourceClassLoader {
             }
 
         } else if (!hasPath && hasRequestMethodDesignator) {
-            return new ResourceMethod(method.getName(), requestMethodDesignator, consumes, produces, parameters, method.getReturnType(), resourceClass);
+            return new ResourceMethod(method.getName(), requestMethodDesignator, consumes, produces, parameters, method.getReturnType());
 
         } else {
             throw new ResourceClassLoadingException("Type for method '" + method.getName() + "' could not be determined.");

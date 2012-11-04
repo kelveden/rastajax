@@ -150,7 +150,7 @@ public class ResourceClassTest {
     }
 
     private ResourceClassMethod dummyMethod() {
-        return new ResourceMethod("somename", "somerequestmethodesignator", new ArrayList<String>(), new ArrayList<String>(), new ArrayList<ResourceClassMethodParameter>(), null, DUMMY_RESOURCE_CLASS);
+        return new ResourceMethod("somename", "somerequestmethodesignator", new ArrayList<String>(), new ArrayList<String>(), new ArrayList<ResourceClassMethodParameter>(), null);
     }
 }
 

@@ -218,18 +218,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         final Map<String, List<FlatResourceMethodParameter>> parameters = representParameters(resourceClassMethod.getParameters());
         final String requestMethodDesignator = representRequestMethodDesignator(resourceClassMethod);
 
-        final String resourceClassName;
-        if (resourceClassMethod instanceof SubResourceMethod) {
-            resourceClassName = resourceClass.getRawClass().getName();
-
-        } else if (resourceClassMethod instanceof ResourceMethod) {
-            resourceClassName = ((ResourceMethod) resourceClassMethod).getRawResourceClass().getName();
-
-        } else {
-            throw new UnsupportedOperationException("A resource class method of type '" + resourceClassMethod.getClass().getName() + "' is not supported here. This most likely represents a bug in Rastjax.");
-        }
-
-        return new FlatResourceMethod(resourceClassMethod.getName(), requestMethodDesignator, parameters, consumes, produces, resourceClassName);
+        return new FlatResourceMethod(resourceClassMethod.getName(), requestMethodDesignator, parameters, consumes, produces, resourceClass.getRawClass().getName());
     }
 
     private FlatResource representResource(final String uriTemplate, final List<FlatResourceMethod> resourceMethods) {
