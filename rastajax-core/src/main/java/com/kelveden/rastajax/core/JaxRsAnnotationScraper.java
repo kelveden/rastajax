@@ -29,15 +29,6 @@ import java.util.Set;
  */
 final class JaxRsAnnotationScraper {
 
-    public static final Set<Class<? extends Annotation>> PARAMETER_ANNOTATION_TYPES = new HashSet<Class<? extends Annotation>>() { {
-        add(FormParam.class);
-        add(PathParam.class);
-        add(QueryParam.class);
-        add(MatrixParam.class);
-        add(HeaderParam.class);
-        add(CookieParam.class);
-    } };
-
     private JaxRsAnnotationScraper() {
     }
 
@@ -76,8 +67,8 @@ final class JaxRsAnnotationScraper {
      * @param parameterIndex The index of the parameter on the method.
      * @return The {@link java.lang.annotation.Annotation}s as a {@link java.util.Set}.
      */
-    public static Set<Annotation> scrapeJaxRsParameterAnnotationsFrom(final Class<?> clazz, final Method method, final int parameterIndex) {
-        return new HashSet<Annotation>(scrapeUniqueJaxRsParameterAnnotationsFrom(clazz, method, parameterIndex).values());
+    public static Set<Annotation> scrapeJaxRsAnnotationsFrom(final Class<?> clazz, final Method method, final int parameterIndex) {
+        return new HashSet<Annotation>(scrapeUniqueJaxRsAnnotationsFrom(clazz, method, parameterIndex).values());
     }
 
     /**
@@ -88,21 +79,8 @@ final class JaxRsAnnotationScraper {
      *
      * @return The {@link java.lang.annotation.Annotation}s as a {@link java.util.Set}.
      */
-    public static Set<Annotation> scrapeJaxRsParameterAnnotationsFrom(final Field field) {
-        return new HashSet<Annotation>(scrapeUniqueJaxRsParameterAnnotationsFrom(field).values());
-    }
-
-    /**
-     * Scrapes the <a href="http://jsr311.java.net/">JAX-RS</a> {@link java.lang.annotation.Annotation}s relevant against a field or property
-     * from the supplied {@link Method} that may be a property getter.
-     *
-     * @param clazz The {@link Class} that the {@link Method} belongs to.
-     * @param method The {@link Method} to scan for annotations.
-     *
-     * @return The {@link java.lang.annotation.Annotation}s as a {@link java.util.Set}.
-     */
-    public static Set<Annotation> scrapeJaxRsParameterAnnotationsFrom(Class<?> clazz, Method method) {
-        return new HashSet<Annotation>(scrapeUniqueJaxRsParameterAnnotationsFrom(clazz, method).values());
+    public static Set<Annotation> scrapeJaxRsAnnotationsFrom(final Field field) {
+        return new HashSet<Annotation>(scrapeUniqueJaxRsAnnotationsFrom(field).values());
     }
 
     private static Map<String, Annotation> scrapeUniqueJaxRsAnnotationsFrom(final Class<?> clazz) {
@@ -157,35 +135,7 @@ final class JaxRsAnnotationScraper {
         return annotationTypeToInstanceMap;
     }
 
-    private static Map<String, Annotation> scrapeUniqueJaxRsParameterAnnotationsFrom(final Class<?> clazz, final Method method) {
-
-        final Map<String, Annotation> annotationTypeToInstanceMap = new HashMap<String, Annotation>();
-
-        final Method clazzMethod = getMethodOnClass(clazz, method);
-
-        if (clazzMethod != null) {
-            for (Annotation annotation : clazzMethod.getDeclaredAnnotations()) {
-                if (isJaxRsParameterAnnotation(annotation)) {
-                    annotationTypeToInstanceMap.put(annotation.annotationType().getName(), annotation);
-                }
-            }
-        }
-
-        if (annotationTypeToInstanceMap.size() == 0) {
-            for (Class<?> superType : clazz.getInterfaces()) {
-                annotationTypeToInstanceMap.putAll(scrapeUniqueJaxRsParameterAnnotationsFrom(superType, method));
-            }
-
-            final Class<?> superClass = clazz.getSuperclass();
-            if (superClass != null) {
-                annotationTypeToInstanceMap.putAll(scrapeUniqueJaxRsParameterAnnotationsFrom(superClass, method));
-            }
-        }
-
-        return annotationTypeToInstanceMap;
-    }
-
-    private static Map<String, Annotation> scrapeUniqueJaxRsParameterAnnotationsFrom(final Class<?> clazz, final Method method, final int parameterIndex) {
+    private static Map<String, Annotation> scrapeUniqueJaxRsAnnotationsFrom(final Class<?> clazz, final Method method, final int parameterIndex) {
 
         final Map<String, Annotation> annotationTypeToInstanceMap = new HashMap<String, Annotation>();
 
@@ -193,7 +143,7 @@ final class JaxRsAnnotationScraper {
 
         if (clazzMethod != null) {
             for (Annotation annotation : clazzMethod.getParameterAnnotations()[parameterIndex]) {
-                if (isJaxRsParameterAnnotation(annotation)) {
+                if (isJaxRsAnnotation(annotation)) {
                     annotationTypeToInstanceMap.put(annotation.annotationType().getName(), annotation);
                 }
             }
@@ -201,24 +151,24 @@ final class JaxRsAnnotationScraper {
 
         if (annotationTypeToInstanceMap.size() == 0) {
             for (Class<?> superType : clazz.getInterfaces()) {
-                annotationTypeToInstanceMap.putAll(scrapeUniqueJaxRsParameterAnnotationsFrom(superType, method, parameterIndex));
+                annotationTypeToInstanceMap.putAll(scrapeUniqueJaxRsAnnotationsFrom(superType, method, parameterIndex));
             }
 
             final Class<?> superClass = clazz.getSuperclass();
             if (superClass != null) {
-                annotationTypeToInstanceMap.putAll(scrapeUniqueJaxRsParameterAnnotationsFrom(superClass, method, parameterIndex));
+                annotationTypeToInstanceMap.putAll(scrapeUniqueJaxRsAnnotationsFrom(superClass, method, parameterIndex));
             }
         }
 
         return annotationTypeToInstanceMap;
     }
 
-    private static Map<String, Annotation> scrapeUniqueJaxRsParameterAnnotationsFrom(final Field field) {
+    private static Map<String, Annotation> scrapeUniqueJaxRsAnnotationsFrom(final Field field) {
 
         final Map<String, Annotation> annotationTypeToInstanceMap = new HashMap<String, Annotation>();
 
         for (Annotation annotation : field.getDeclaredAnnotations()) {
-            if (isJaxRsParameterAnnotation(annotation)) {
+            if (isJaxRsAnnotation(annotation)) {
                 annotationTypeToInstanceMap.put(annotation.annotationType().getName(), annotation);
             }
         }
@@ -236,9 +186,5 @@ final class JaxRsAnnotationScraper {
 
     private static boolean isJaxRsAnnotation(final Annotation annotation) {
         return annotation.annotationType().getPackage().getName().startsWith("javax.ws.rs");
-    }
-
-    private static boolean isJaxRsParameterAnnotation(final Annotation annotation) {
-        return PARAMETER_ANNOTATION_TYPES.contains(annotation.annotationType());
     }
 }

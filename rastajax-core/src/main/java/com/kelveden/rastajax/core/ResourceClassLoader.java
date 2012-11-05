@@ -36,6 +36,15 @@ class ResourceClassLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceClassLoader.class);
     private static final int UNDERLINE_LENGTH = 60;
 
+    public static final Set<Class<? extends Annotation>> PARAMETER_TYPE_ANNOTATIONS = new HashSet<Class<? extends Annotation>>() { {
+        add(FormParam.class);
+        add(PathParam.class);
+        add(QueryParam.class);
+        add(MatrixParam.class);
+        add(HeaderParam.class);
+        add(CookieParam.class);
+    } };
+
     public ResourceClass loadResourceClassFrom(final Class<?> candidateResourceClass) {
 
         LOGGER.debug(StringUtils.repeat("-", UNDERLINE_LENGTH));
@@ -80,11 +89,13 @@ class ResourceClassLoader {
 
         LOGGER.debug("Class is a resource class.");
 
+        LOGGER.debug("Finding fields...");
         final List<Parameter> fields = loadClassFields(candidateResourceClass);
         LOGGER.debug("Found {} fields.", fields.size());
 
+        LOGGER.debug("Finding properties...");
         final List<Parameter> properties = loadClassProperties(candidateResourceClass);
-        LOGGER.debug("Found {} properties that will be treated as fields.", properties.size());
+        LOGGER.debug("Found {} properties.", properties.size());
 
         fields.addAll(properties);
 
@@ -98,7 +109,7 @@ class ResourceClassLoader {
         final List<Parameter> fields = new ArrayList<Parameter>();
 
         for (Field field : resourceClass.getFields()) {
-            final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(field);
+            final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(field);
 
             try {
                 final Parameter parameter = buildParameterFromJaxRsAnnotations(annotations, field.getType());
@@ -130,7 +141,7 @@ class ResourceClassLoader {
         final List<Parameter> fields = new ArrayList<Parameter>();
 
         for (Method method : resourceClass.getDeclaredMethods()) {
-            final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(resourceClass, method);
+            final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(resourceClass, method);
 
             try {
                 final Parameter parameter = buildParameterFromJaxRsAnnotations(annotations, method.getReturnType());
@@ -139,6 +150,8 @@ class ResourceClassLoader {
                     LOGGER.debug("{} Found {} property '{}' of type '{}'.", logPrefix, parameter.getJaxRsAnnotationType().getSimpleName(), parameter.getName(), parameter.getType().getName());
 
                     fields.add(parameter);
+                } else {
+                    LOGGER.debug("{} Method {} was not annotated with any annotations that describe the JAX-RS parameter type and so will be ignored.", logPrefix, method.getName());
                 }
 
             } catch (IllegalAccessException e) {
@@ -265,7 +278,7 @@ class ResourceClassLoader {
 
         final String logPrefix = " |---";
 
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(clazz, method, parameterIndex);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(clazz, method, parameterIndex);
         LOGGER.debug("{} Found parameter annotations {}.", logPrefix, annotations.toString());
 
         final Class<?> type = method.getParameterTypes()[parameterIndex];
@@ -290,7 +303,7 @@ class ResourceClassLoader {
         String parameterName = null;
 
         for (Annotation annotation : annotations) {
-            if (JaxRsAnnotationScraper.PARAMETER_ANNOTATION_TYPES.contains(annotation.annotationType())) {
+            if (PARAMETER_TYPE_ANNOTATIONS.contains(annotation.annotationType())) {
                 parameterAnnotationType = annotation.annotationType();
                 parameterName = (String) annotation.annotationType().getMethod("value").invoke(annotation);
             }

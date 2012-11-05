@@ -26,6 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -239,7 +240,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -269,7 +270,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -305,7 +306,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -447,7 +448,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -477,7 +478,7 @@ public class JaxRsAnnotationScraperTest {
         final Method method = compiledClass.getMethod("doSomething", String.class);
 
         // When
-        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsParameterAnnotationsFrom(compiledClass, method, 0);
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method, 0);
 
         // Then
         assertThat(annotations, contains(
@@ -487,47 +488,48 @@ public class JaxRsAnnotationScraperTest {
     }
 
     @Test
-    public void resourceClassFieldsAreScraped() throws NoSuchMethodException {
-//
-//        // Given
-//        final String resourceClassSource =
-//                "import javax.ws.rs.*;" +
-//                        "public class MyResourceClass {" +
-//                        "@PathParam(\"myparam\") String myParam; " +
-//                        "}";
-//
-//        final Class<?> compiledClass = compiler.compileFromSource(resourceClassSource);
-//        final Method method = compiledClass.getMethod("doSomething", String.class);
-//
-//        // When
-//        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrape(compiledClass, method, 0);
-//
-//        // Then
-//        assertThat(annotations, contains(
-//                Matchers.allOf(
-//                        annotationValueIs("classparam"),
-//                        annotationTypeIs(QueryParam.class))));
+    public void resourceClassFieldsAreScraped() throws NoSuchMethodException, NoSuchFieldException {
+
+        // Given
+        final String resourceClassSource =
+                "import javax.ws.rs.*;" +
+                        "public class MyResourceClass {" +
+                        "@QueryParam(\"myparam\") public String myParam; " +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(resourceClassSource);
+        final Field field = compiledClass.getField("myParam");
+
+        // When
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(field);
+
+        // Then
+        assertThat(annotations, contains(
+                Matchers.allOf(
+                        annotationValueIs("myparam"),
+                        annotationTypeIs(QueryParam.class))));
     }
 
     @Test
-    public void resourceClassPropertiesAreScrapedAsFields() {
-    }
+    public void resourceClassPropertiesAreScrapedAsFields() throws NoSuchFieldException, NoSuchMethodException {
 
-    @Test
-    public void resourceClassPropertiesFromInterfaceAreScraped() {
-    }
+        // Given
+        final String resourceClassSource =
+                "import javax.ws.rs.*;" +
+                        "public class MyResourceClass {" +
+                        "@QueryParam(\"myparam\") public String getMyParam() { return \"\"; } " +
+                        "}";
 
-    @Test
-    public void resourceClassPropertyFromInterfaceIsIgnoredIfResourceClassHasPropertyAnnotationOfItsOwn() {
+        final Class<?> compiledClass = compiler.compileFromSource(resourceClassSource);
+        final Method method = compiledClass.getMethod("getMyParam");
 
-    }
+        // When
+        final Set<Annotation> annotations = JaxRsAnnotationScraper.scrapeJaxRsAnnotationsFrom(compiledClass, method);
 
-    @Test
-    public void resourceClassPropertiesFromSuperclassAreScraped() {
-    }
-
-    @Test
-    public void resourceClassPropertyFromSuperclassIsIgnoredIfResourceClassHasPropertyAnnotationOfItsOwn() {
-
+        // Then
+        assertThat(annotations, contains(
+                Matchers.allOf(
+                        annotationValueIs("myparam"),
+                        annotationTypeIs(QueryParam.class))));
     }
 }

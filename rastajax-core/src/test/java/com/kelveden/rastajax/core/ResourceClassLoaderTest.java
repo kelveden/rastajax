@@ -876,6 +876,28 @@ public class ResourceClassLoaderTest {
     }
 
     @Test
+    public void propertyAnnotatedWithJaxRsAnnotationsIsNotLoadedAsAResourceMethod() {
+
+        // Given
+        final String source =
+                "import javax.ws.rs.*;" +
+                        "public class someClass {" +
+                        "@QueryParam(\"myparam\") public String getMyField() { return \"\"; } " +
+                        "@GET public void someMethod() { }" +
+                        "}";
+
+        final Class<?> compiledClass = compiler.compileFromSource(source);
+
+        // When
+        final ResourceClassLoader loader = new ResourceClassLoader();
+        final ResourceClass resource = loader.loadResourceClassFrom(compiledClass);
+
+        // Then
+        MatcherAssert.assertThat(resource.getFields(), hasSize(1));
+        MatcherAssert.assertThat(resource.getMethods(), hasSize(1));
+    }
+
+    @Test
     public void propertyFormParamIsLoaded() {
 
         // Given
