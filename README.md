@@ -8,12 +8,13 @@ A lightweight library for dynamically generating descriptions REST APIs. Please 
 Key features
 ------------
 
-* Standards compliant. Generation of descriptions is based entirely on the annotations from the [JAX-RS 1.1 Specification](http://jsr311.java.net/) plus a single custom annotation.
+* Standards compliant. Generation of descriptions is based on the annotations from the [JAX-RS 1.1 Specification](http://jsr311.java.net/) plus a single custom annotation.
 * Completely independent of any JAX-RS implementation.
 * Lightweight. Dependencies both direct and transitive are kept to a minimum. 
 * Extensible. Rastajax can be extended with classes that:
    * implement alternative strategies for finding resource classes.
    * use the information scanned in from your resource classes to describe your API in alternative ways
+* 
 
 What's in the box
 -----------------
@@ -74,3 +75,10 @@ Rastajax ships with some default servlets that you can hook in to your REST appl
 
 That's it! Now just browse to the servlets and see examples of your API described as JSON and HTML. You can continue using these servlets of course but you'll probably want something more sophisticated longer term. See [the wiki](https://github.com/kelveden/rastajax/wiki/Using-Rastajax) for more details on creating how to create your own Rastajax integration.
 
+Logging
+-------
+Rastasjax logs using the <a href="http://www.slf4j.org">SLF4J logging facade</a>. Why? So that you can continue using your application's existing logging framework without having to worry about managing yet another one.
+
+If your application doesn't already use SLF4J, you'll need to wrap it up as an SLF4J binding using one of the several "bridging" libraries that SLF4J provide. The SLF4J website has <a href="http://www.slf4j.org/legacy.html">extensive notes</a> on doing this. Alternatively, you could switch to a logging framework that exposes itself as a SLF4J binding out of the box - e.g. <a href="http://logback.qos.ch/">Logback</a>.
+
+Rastajax info-level logging is pretty minimal; however, if you enable debug-level logging you'll see a load of information explaining exactly how Rastajax processes your application. This is great for diagnostic purposes when Rastajax is processing a resource oddly (or just missing it altogether).
