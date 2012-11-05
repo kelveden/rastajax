@@ -474,4 +474,57 @@ public class FlatRepresentationBuilderTest {
         assertThat(flatResource.getUriTemplate(), is("my/path/my/subresource/path/subresourcemethod/path"));
         assertThat(flatResource.getResourceMethods().get(0).getResourceClass(), is(this.getClass().getName()));
     }
+
+    @Test
+    public void fieldsFromResourceClassAreAddedAsParametersToAllResourceMethods() {
+
+        final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
+
+        final Parameter field = new Parameter("myparam", QueryParam.class, String.class);
+
+        final ResourceClassMethod resourceMethod = new ResourceMethod(DUMMY_METHOD_NAME, "GET", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, NO_RETURN_TYPE);
+
+        final ResourceClassMethod subResourceMethod = new SubResourceMethod(DUMMY_METHOD_NAME, "some/path1", "GET", DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE);
+
+        // Create sub-resource locator
+        final ResourceClassMethod subResourceLocatorSubResourceMethod = new SubResourceMethod(DUMMY_METHOD_NAME, NO_PATH, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE);
+        final ResourceClass subResourceLocatorSubResource = new ResourceClass(this.getClass(), NO_PATH, Arrays.asList(subResourceLocatorSubResourceMethod), DUMMY_CONSUMES, DUMMY_PRODUCES, NO_FIELDS);
+        final ResourceClassMethod subResourceLocator = new SubResourceLocator(DUMMY_METHOD_NAME, "some/path2", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, subResourceLocatorSubResource) ;
+
+        final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, "my/path", Arrays.asList(resourceMethod, subResourceMethod, subResourceLocator), DUMMY_CONSUMES, DUMMY_PRODUCES, Arrays.asList(field));
+
+        final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
+
+        assertThat(result, hasSize(3));
+
+        FlatResource flatResource = result.iterator().next();
+        assertThat(flatResource.getResourceMethods().get(0).getParameters().get("queryParam").get(0).getName(), is("myparam"));
+
+        flatResource = result.iterator().next();
+        assertThat(flatResource.getResourceMethods().get(0).getParameters().get("queryParam").get(0).getName(), is("myparam"));
+
+        flatResource = result.iterator().next();
+        assertThat(flatResource.getResourceMethods().get(0).getParameters().get("queryParam").get(0).getName(), is("myparam"));
+    }
+
+    @Test
+    public void fieldsFromSubResourceLocatorClassAreAddedAsParametersToAllResourceMethodsTakenFromSubResourceClass() {
+
+        final FlatRepresentationBuilder builder = new FlatRepresentationBuilder();
+
+        final Parameter field = new Parameter("myparam", QueryParam.class, String.class);
+
+        final ResourceClassMethod subResourceLocatorSubResourceMethod = new SubResourceMethod(DUMMY_METHOD_NAME, NO_PATH, DUMMY_REQUEST_METHOD_DESIGNATOR, DUMMY_CONSUMES, DUMMY_PRODUCES, DUMMY_PARAMETERS, NO_RETURN_TYPE);
+        final ResourceClass subResourceLocatorSubResource = new ResourceClass(this.getClass(), NO_PATH, Arrays.asList(subResourceLocatorSubResourceMethod), DUMMY_CONSUMES, DUMMY_PRODUCES, Arrays.asList(field));
+        final ResourceClassMethod subResourceLocator = new SubResourceLocator(DUMMY_METHOD_NAME, "some/path2", DUMMY_PRODUCES, DUMMY_CONSUMES, DUMMY_PARAMETERS, subResourceLocatorSubResource) ;
+
+        final ResourceClass resource = new ResourceClass(DUMMY_RESOURCE_CLASS, "my/path", Arrays.asList(subResourceLocator), DUMMY_CONSUMES, DUMMY_PRODUCES, NO_FIELDS);
+
+        final Set<FlatResource> result = builder.buildRepresentationFor(new HashSet<ResourceClass>(Arrays.asList(resource)));
+
+        assertThat(result, hasSize(1));
+
+        FlatResource flatResource = result.iterator().next();
+        assertThat(flatResource.getResourceMethods().get(0).getParameters().get("queryParam").get(0).getName(), is("myparam"));
+    }
 }

@@ -54,7 +54,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
 
             final MultiValuedMap<String, ResourceClassMethod> resourceClassMethodsByPath = groupResourceClassMethodsByUriTemplate(resourceClass, " |-");
 
-            final List<FlatResource> methodsAsResources = representResourceClassMethods(resourceClassMethodsByPath);
+            final List<FlatResource> methodsAsResources = representResourceClassMethods(resourceClass, resourceClassMethodsByPath);
             result.addAll(methodsAsResources);
 
             LOGGER.debug("Finished analyzing methods: flattened methods to {} distinct resource(s) in representation.", methodsAsResources.size());
@@ -192,7 +192,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         return parameters;
     }
 
-    private List<FlatResource> representResourceClassMethods(final MultiValuedMap<String, ResourceClassMethod> resourceClassMethodsByUriTemplate) {
+    private List<FlatResource> representResourceClassMethods(final ResourceClass resourceClass, final MultiValuedMap<String, ResourceClassMethod> resourceClassMethodsByUriTemplate) {
 
         final List<FlatResource> result = new ArrayList<FlatResource>();
 
@@ -201,7 +201,7 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
 
             final List<FlatResourceMethod> flatResourceMethods = new ArrayList<FlatResourceMethod>();
             for (ResourceClassMethod rawMethod : subResourceMethodsGroupedByPath.getValue()) {
-                flatResourceMethods.add(representResourceClassMethod(rawMethod, rawMethod.getResourceClass()));
+                flatResourceMethods.add(representResourceClassMethod(resourceClass, rawMethod.getResourceClass(), rawMethod));
             }
 
             result.add(representResource(uriTemplate, flatResourceMethods));
@@ -210,15 +210,21 @@ public class FlatRepresentationBuilder implements RepresentationBuilder<Set<Flat
         return result;
     }
 
-    private FlatResourceMethod representResourceClassMethod(final ResourceClassMethod resourceClassMethod, final ResourceClass resourceClass) {
+    private FlatResourceMethod representResourceClassMethod(final ResourceClass resourceClass, final ResourceClass resourceClassContainingMethod, final ResourceClassMethod resourceClassMethod) {
 
-        final List<String> produces = representMediaTypeListForMethod(resourceClassMethod.getProduces(), resourceClass.getProduces());
-        final List<String> consumes = representMediaTypeListForMethod(resourceClassMethod.getConsumes(), resourceClass.getConsumes());
+        final List<String> produces = representMediaTypeListForMethod(resourceClassMethod.getProduces(), resourceClassContainingMethod.getProduces());
+        final List<String> consumes = representMediaTypeListForMethod(resourceClassMethod.getConsumes(), resourceClassContainingMethod.getConsumes());
 
         final Map<String, List<FlatResourceMethodParameter>> parameters = representParameters(resourceClassMethod.getParameters());
+        parameters.putAll(representParameters(resourceClassContainingMethod.getFields()));
+
+        if (resourceClass == resourceClassContainingMethod) {
+            parameters.putAll(representParameters(resourceClass.getFields()));
+        }
+
         final String requestMethodDesignator = representRequestMethodDesignator(resourceClassMethod);
 
-        return new FlatResourceMethod(resourceClassMethod.getName(), requestMethodDesignator, parameters, consumes, produces, resourceClass.getRawClass().getName());
+        return new FlatResourceMethod(resourceClassMethod.getName(), requestMethodDesignator, parameters, consumes, produces, resourceClassContainingMethod.getRawClass().getName());
     }
 
     private FlatResource representResource(final String uriTemplate, final List<FlatResourceMethod> resourceMethods) {
