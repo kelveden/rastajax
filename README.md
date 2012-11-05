@@ -3,7 +3,7 @@ Rastajax
 
 > **IMPORTANT**: This project is in its early stages of evolution. There are currently NO releases available, just the source code. As soon as I have a first release ready I'll get it pushed to Maven Central. Keep your eyes on [issue #1](https://github.com/kelveden/rastajax/issues/1) for an indication of when this is done. Whilst it is already usable, I strongly suggest that you hold off trying Rastajax until then as there are likely to be a fair few changes breaking backwards compatibility until then.
 
-A lightweight library for dynamically generating descriptions REST APIs. Please see the wiki for an in-depth discussion. The rest of this page is a brief overview and quick start.
+A lightweight library for dynamically generating descriptions of JAX-RS-compliant REST APIs. Please see the wiki for an in-depth discussion. The rest of this page is a brief overview and quick start.
 
 Key features
 ------------
