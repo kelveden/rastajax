@@ -13,8 +13,7 @@ Key features
 * Lightweight. Dependencies both direct and transitive are kept to a minimum. 
 * Extensible. Rastajax can be extended with classes that:
    * implement alternative strategies for finding resource classes.
-   * use the information scanned in from your resource classes to describe your API in alternative ways
-* 
+   * use the information scanned in from your resource classes to describe your API in alternative ways.
 
 What's in the box
 -----------------
