@@ -8,7 +8,7 @@ A lightweight library for dynamically generating descriptions of JAX-RS-complian
 Key features
 ------------
 
-* Standards compliant. Generation of descriptions is based on the annotations from the [JAX-RS 1.1 Specification](http://jsr311.java.net/) plus a single custom annotation.
+* Standards compliant. Generation of descriptions is based on the annotations from the [JAX-RS 1.1 Specification](http://jsr311.java.net/).
 * Completely independent of any JAX-RS implementation.
 * Lightweight. Dependencies both direct and transitive are kept to a minimum. 
 * Extensible. Rastajax can be extended with classes that:
