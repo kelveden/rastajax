@@ -38,16 +38,14 @@
     <developers>
         <developer>
             <name>Alistair Dutton</name>
-            <roles>
-                <role>Lead Developer</role>
-            </roles>
         </developer>
     </developers>
 
     <licenses>
         <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
@@ -132,12 +130,26 @@
         	<plugin>
         		<groupId>org.apache.maven.plugins</groupId>
         		<artifactId>maven-compiler-plugin</artifactId>
-        		<version>2.5.1</version>
+        		<version>3.0</version>
                 <configuration>
                     <verbose>true</verbose>
                     <target>1.6</target>
                     <source>1.6</source>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
