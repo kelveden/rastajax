@@ -92,11 +92,10 @@ public class Runner {
 
     private static void writeResourceMethod(final String resourceUriTemplate, FlatResourceMethod resourceMethod) {
 
-        printInfo("========================================");
+        printInfo("");
         printInfo(ANSI_GREEN + resourceMethod.getRequestMethodDesignator() + " " + resourceUriTemplate + ANSI_RESET);
-        printInfo("========================================");
 
-        printInfo(ANSI_RED + resourceMethod.getName() + ANSI_RESET + "(" + parametersToString(resourceMethod) + ")");
+        printInfo("   - " + ANSI_RED + resourceMethod.getName() + ANSI_RESET + "(" + parametersToString(resourceMethod) + ")");
         printInfo(mediaTypesToString(ANSI_YELLOW + "Consumes: " + ANSI_RESET, resourceMethod.getConsumes()));
         printInfo(mediaTypesToString(ANSI_BLUE + "Produces: " + ANSI_RESET, resourceMethod.getProduces()));
     }
@@ -125,7 +124,7 @@ public class Runner {
         if (mediaTypes.size() == 0) {
             return null;
         } else {
-            return header + StringUtils.join(mediaTypes.toArray(new String[mediaTypes.size()]), ", ");
+            return "   - " + header + StringUtils.join(mediaTypes.toArray(new String[mediaTypes.size()]), ", ");
         }
     }
 }
