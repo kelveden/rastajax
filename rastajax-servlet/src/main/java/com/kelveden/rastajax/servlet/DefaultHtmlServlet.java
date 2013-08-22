@@ -54,7 +54,8 @@ public class DefaultHtmlServlet extends HttpServlet {
     @Override
     protected final void doGet(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse) throws ServletException, IOException {
 
-        final ClassLoaderRootResourceScanner scanner = new ClassLoaderRootResourceScanner(this.getClass().getClassLoader(), apiPackages.split(",")).allowInterfaceInheritance();
+        final ClassLoaderRootResourceScanner scanner = new ClassLoaderRootResourceScanner(this.getClass().getClassLoader(), apiPackages.split(","))
+                .allowInterfaceInheritance();
 
         final Set<FlatResource> representation = RestDescriber.describeApplication(
                 scanner.scan(),
