@@ -66,8 +66,7 @@ public class Runner {
 
         final ClassLoaderRootResourceScanner scanner = new ClassLoaderRootResourceScanner(
                 classLoader,
-                new String[] { "com.nokia.ent.musicology.res.rest", "com.nokia.ent.musicology.res.jaxrs"  })
-                .allowInterfaceInheritance();
+                args[1].split(",")).allowInterfaceInheritance();
 
         final Set<FlatResource> representation = RestDescriber.describeApplication(
                 scanner.scan(),
@@ -86,6 +85,7 @@ public class Runner {
         printInfo(resourceMethod.getRequestMethodDesignator() + " " + resourceUriTemplate);
         printInfo("========================================");
 
+        printInfo("Name: " + resourceMethod.getName());
         printInfo("Parameters: " + parametersToString(resourceMethod));
         printInfo("Consumes: " + mediaTypesToString(resourceMethod.getConsumes()));
         printInfo("Produces: " + mediaTypesToString(resourceMethod.getProduces()));
