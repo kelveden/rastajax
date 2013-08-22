@@ -26,6 +26,7 @@ import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,16 @@ import java.util.Map;
 import java.util.Set;
 
 public class Runner {
+
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BLACK = "\u001B[30m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_CYAN = "\u001B[36m";
+    private static final String ANSI_WHITE = "\u001B[37m";
 
     public static void main(String[] args) throws IOException {
 
@@ -82,17 +93,18 @@ public class Runner {
     private static void writeResourceMethod(final String resourceUriTemplate, FlatResourceMethod resourceMethod) {
 
         printInfo("========================================");
-        printInfo(resourceMethod.getRequestMethodDesignator() + " " + resourceUriTemplate);
+        printInfo(ANSI_GREEN + resourceMethod.getRequestMethodDesignator() + " " + resourceUriTemplate + ANSI_RESET);
         printInfo("========================================");
 
-        printInfo("Name: " + resourceMethod.getName());
-        printInfo("Parameters: " + parametersToString(resourceMethod));
-        printInfo("Consumes: " + mediaTypesToString(resourceMethod.getConsumes()));
-        printInfo("Produces: " + mediaTypesToString(resourceMethod.getProduces()));
+        printInfo(ANSI_RED + resourceMethod.getName() + ANSI_RESET + "(" + parametersToString(resourceMethod) + ")");
+        printInfo(mediaTypesToString(ANSI_YELLOW + "Consumes: " + ANSI_RESET, resourceMethod.getConsumes()));
+        printInfo(mediaTypesToString(ANSI_BLUE + "Produces: " + ANSI_RESET, resourceMethod.getProduces()));
     }
 
     private static void printInfo(final String info) {
-        System.out.println(info);
+        if (info != null) {
+            AnsiConsole.out.println(info);
+        }
     }
 
     private static String parametersToString(final FlatResourceMethod method) {
@@ -101,19 +113,19 @@ public class Runner {
 
         for (Map.Entry<String, List<FlatResourceMethodParameter>> parameterEntry : method.getParameters().entrySet()) {
             for (FlatResourceMethodParameter parameter : parameterEntry.getValue()) {
-                parameterNames.add(parameter.getName() + " [" + parameter.getType() + "]");
+                parameterNames.add(ANSI_CYAN + parameter.getType() + ANSI_RESET + " " + parameter.getName());
             }
         }
 
         return StringUtils.join(parameterNames.toArray(new String[parameterNames.size()]), ", ");
     }
 
-    private static String mediaTypesToString(final List<String> mediaTypes) {
+    private static String mediaTypesToString(final String header, final List<String> mediaTypes) {
 
         if (mediaTypes.size() == 0) {
-            return "N/A";
+            return null;
         } else {
-            return StringUtils.join(mediaTypes.toArray(new String[mediaTypes.size()]), ", ");
+            return header + StringUtils.join(mediaTypes.toArray(new String[mediaTypes.size()]), ", ");
         }
     }
 }
