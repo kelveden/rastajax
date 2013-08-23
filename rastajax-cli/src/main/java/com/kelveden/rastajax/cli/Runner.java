@@ -86,18 +86,19 @@ public class Runner {
                 new FlatRepresentationBuilder());
 
         for (FlatResource f : representation) {
+            printInfo("");
+            printInfo(ANSI_GREEN + f.getUriTemplate() + ANSI_RESET);
             for (FlatResourceMethod m : f.getResourceMethods()) {
-                writeResourceMethod(f.getUriTemplate(), m);
+                writeResourceMethod(m);
             }
         }
     }
 
-    private static void writeResourceMethod(final String resourceUriTemplate, FlatResourceMethod resourceMethod) {
+    private static void writeResourceMethod(FlatResourceMethod resourceMethod) {
 
-        printInfo("");
-        printInfo(ANSI_CYAN + resourceMethod.getRequestMethodDesignator() + " " + ANSI_GREEN + resourceUriTemplate + ANSI_RESET + " [" + resourceMethod.getResourceClass() + "]");
+        printInfo("    " + ANSI_CYAN + resourceMethod.getRequestMethodDesignator() + ANSI_RESET + " [" + resourceMethod.getResourceClass() + "]");
 
-        printInfo("   - " + ANSI_RED + resourceMethod.getName() + ANSI_RESET + "(" + parametersToString(resourceMethod) + ")");
+        printInfo("       - " + ANSI_RED + resourceMethod.getName() + ANSI_RESET + "(" + parametersToString(resourceMethod) + ")");
         printInfo(mediaTypesToString(ANSI_CYAN + "Produces: " + ANSI_RESET, resourceMethod.getProduces()));
         printInfo(mediaTypesToString(ANSI_BLUE + "Consumes: " + ANSI_RESET, resourceMethod.getConsumes()));
     }
@@ -126,7 +127,7 @@ public class Runner {
         if (mediaTypes.size() == 0) {
             return null;
         } else {
-            return "   - " + header + StringUtils.join(mediaTypes.toArray(new String[mediaTypes.size()]), ", ");
+            return "       - " + header + StringUtils.join(mediaTypes.toArray(new String[mediaTypes.size()]), ", ");
         }
     }
 }
