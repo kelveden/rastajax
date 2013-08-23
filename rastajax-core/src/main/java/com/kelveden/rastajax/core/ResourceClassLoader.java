@@ -181,7 +181,13 @@ class ResourceClassLoader {
 
         final List<ResourceClassMethod> methodsOnResource = new ArrayList<ResourceClassMethod>();
 
-        final Method[] methods = candidateResourceClass.getDeclaredMethods();
+        Method[] methods;
+        try {
+            methods = candidateResourceClass.getDeclaredMethods();
+        } catch (NoClassDefFoundError e) {
+            LOGGER.warn("Could not process candidate resource class {} as a class referenced in it could not be found.", candidateResourceClass.getName(), e);
+            return methodsOnResource;
+        }
 
         for (Method method : methods) {
             if (Modifier.isPublic(method.getModifiers())) {
