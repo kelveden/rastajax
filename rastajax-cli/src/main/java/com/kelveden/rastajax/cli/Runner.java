@@ -26,17 +26,18 @@ import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Runner {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Runner.class);
 
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_BLACK = "\u001B[30m";
@@ -50,12 +51,15 @@ public class Runner {
 
     public static void main(String[] args) throws IOException {
 
-        final String warFile = args[0];
+        final File warFile = args.length > 0 ? new File(args[0]) : findWar();
         final String packages = args.length > 1 ? args[1] : "com,org,net";
+
+        LOGGER.info("Loading war from " + warFile.getAbsolutePath());
 
         final File tempFolder = new File(FileUtils.getTempDirectory(), "rastajax-explode");
         FileUtils.forceMkdir(tempFolder);
         FileUtils.cleanDirectory(tempFolder);
+
 
         try {
             ZipFile zipFile = new ZipFile(warFile);
@@ -91,6 +95,18 @@ public class Runner {
             for (FlatResourceMethod m : f.getResourceMethods()) {
                 writeResourceMethod(m);
             }
+        }
+    }
+
+    private static File findWar() {
+        final Collection<File> wars = FileUtils.listFiles(new File(System.getProperty("user.dir")), new String[] { "war" }, true);
+
+        LOGGER.info("Found the following wars: " + wars.toString());
+
+        if (wars.size() > 0) {
+            return wars.iterator().next();
+        } else {
+            return null;
         }
     }
 
