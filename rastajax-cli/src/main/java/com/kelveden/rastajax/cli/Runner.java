@@ -50,12 +50,15 @@ public class Runner {
 
     public static void main(String[] args) throws IOException {
 
+        final String warFile = args[0];
+        final String packages = args.length > 1 ? args[1] : "com,org,net";
+
         final File tempFolder = new File(FileUtils.getTempDirectory(), "rastajax-explode");
         FileUtils.forceMkdir(tempFolder);
         FileUtils.cleanDirectory(tempFolder);
 
         try {
-            ZipFile zipFile = new ZipFile(args[0]);
+            ZipFile zipFile = new ZipFile(warFile);
             zipFile.extractAll(tempFolder.getAbsolutePath());
 
         } catch (ZipException e) {
@@ -76,7 +79,7 @@ public class Runner {
 
         final ClassLoaderRootResourceScanner scanner = new ClassLoaderRootResourceScanner(
                 classLoader,
-                args[1].split(",")).allowInterfaceInheritance();
+                packages.split(",")).allowInterfaceInheritance();
 
         final Set<FlatResource> representation = RestDescriber.describeApplication(
                 scanner.scan(),
