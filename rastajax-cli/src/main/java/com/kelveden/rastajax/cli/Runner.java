@@ -26,7 +26,6 @@ import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
-import org.fusesource.jansi.AnsiConsole;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,16 +92,16 @@ public class Runner {
     private static void writeResourceMethod(final String resourceUriTemplate, FlatResourceMethod resourceMethod) {
 
         printInfo("");
-        printInfo(ANSI_GREEN + resourceMethod.getRequestMethodDesignator() + " " + resourceUriTemplate + ANSI_RESET);
+        printInfo(ANSI_CYAN + resourceMethod.getRequestMethodDesignator() + " " + ANSI_GREEN + resourceUriTemplate + ANSI_RESET);
 
         printInfo("   - " + ANSI_RED + resourceMethod.getName() + ANSI_RESET + "(" + parametersToString(resourceMethod) + ")");
-        printInfo(mediaTypesToString(ANSI_YELLOW + "Consumes: " + ANSI_RESET, resourceMethod.getConsumes()));
-        printInfo(mediaTypesToString(ANSI_BLUE + "Produces: " + ANSI_RESET, resourceMethod.getProduces()));
+        printInfo(mediaTypesToString(ANSI_CYAN + "Produces: " + ANSI_RESET, resourceMethod.getProduces()));
+        printInfo(mediaTypesToString(ANSI_BLUE + "Consumes: " + ANSI_RESET, resourceMethod.getConsumes()));
     }
 
     private static void printInfo(final String info) {
         if (info != null) {
-            AnsiConsole.out.println(info);
+            System.out.println(info);
         }
     }
 
