@@ -95,7 +95,7 @@ public class Runner {
     private static void writeResourceMethod(final String resourceUriTemplate, FlatResourceMethod resourceMethod) {
 
         printInfo("");
-        printInfo(ANSI_CYAN + resourceMethod.getRequestMethodDesignator() + " " + ANSI_GREEN + resourceUriTemplate + ANSI_RESET);
+        printInfo(ANSI_CYAN + resourceMethod.getRequestMethodDesignator() + " " + ANSI_GREEN + resourceUriTemplate + ANSI_RESET + " [" + resourceMethod.getResourceClass() + "]");
 
         printInfo("   - " + ANSI_RED + resourceMethod.getName() + ANSI_RESET + "(" + parametersToString(resourceMethod) + ")");
         printInfo(mediaTypesToString(ANSI_CYAN + "Produces: " + ANSI_RESET, resourceMethod.getProduces()));
