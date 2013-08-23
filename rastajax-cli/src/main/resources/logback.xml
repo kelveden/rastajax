@@ -10,7 +10,7 @@
     </appender>
 
     <logger name="org.reflections" level="warn" />
-    <logger name="com.kelveden.rastajax" level="warn" />
+    <logger name="com.kelveden.rastajax" level="${logging.level:-warn}" />
 
     <root level="info">
         <appender-ref ref="console" />
