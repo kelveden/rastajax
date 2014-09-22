@@ -18,13 +18,13 @@ package com.kelveden.rastajax.cli;
 /**
  * Wrapper function for exceptions raised at runtime from the CLI interface.
  */
-public class CliExecutionExecution extends Exception {
+public class CliExecutionException extends Exception {
 
-    public CliExecutionExecution(final String message) {
+    public CliExecutionException(final String message) {
         super(message);
     }
 
-    public CliExecutionExecution(final String message, final Throwable cause) {
+    public CliExecutionException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

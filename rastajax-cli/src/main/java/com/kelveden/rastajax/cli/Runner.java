@@ -49,7 +49,7 @@ public class Runner {
     private static final String ANSI_BLUE = "\u001B[34m";
     private static final String ANSI_CYAN = "\u001B[36m";
 
-    public static void main(String[] args) throws CliExecutionExecution {
+    public static void main(String[] args) throws CliExecutionException {
 
         if (args.length == 0) {
             System.out.println("Usage: rastajax <war file> [<comma-separated packages]");
@@ -90,7 +90,7 @@ public class Runner {
                 new FlatRepresentationBuilder());
     }
 
-    private static List<URL> getClasspathURLs(File workingDirectory) throws CliExecutionExecution {
+    private static List<URL> getClasspathURLs(File workingDirectory) throws CliExecutionException {
 
         final File classesFolder = new File(workingDirectory, "WEB-INF/classes");
         final File libFolder = new File(workingDirectory, "WEB-INF/lib");
@@ -100,7 +100,7 @@ public class Runner {
             urls.add(classesFolder.toURI().toURL());
 
         } catch (final MalformedURLException e) {
-            throw new CliExecutionExecution("Could not get the URL for '" + classesFolder.getAbsolutePath() + "'.", e);
+            throw new CliExecutionException("Could not get the URL for '" + classesFolder.getAbsolutePath() + "'.", e);
         }
 
         for (File file : FileUtils.listFiles(libFolder, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE)) {
@@ -108,24 +108,24 @@ public class Runner {
                 urls.add(file.toURI().toURL());
 
             } catch (final MalformedURLException e) {
-                throw new CliExecutionExecution("Could not get the URL for '" + file.getAbsolutePath() + "'.", e);
+                throw new CliExecutionException("Could not get the URL for '" + file.getAbsolutePath() + "'.", e);
             }
         }
 
         return urls;
     }
 
-    private static void extractWarFile(File warFile, File workingDirectory) throws CliExecutionExecution {
+    private static void extractWarFile(File warFile, File workingDirectory) throws CliExecutionException {
         try {
             ZipFile zipFile = new ZipFile(warFile);
             zipFile.extractAll(workingDirectory.getAbsolutePath());
 
         } catch (final ZipException e) {
-            throw new CliExecutionExecution("Could not extract WAR file.", e);
+            throw new CliExecutionException("Could not extract WAR file.", e);
         }
     }
 
-    private static File ensureWorkingDirectory() throws CliExecutionExecution {
+    private static File ensureWorkingDirectory() throws CliExecutionException {
 
         final File tempFolder = new File(FileUtils.getTempDirectory(), "rastajax-explode");
 
@@ -134,7 +134,7 @@ public class Runner {
             FileUtils.cleanDirectory(tempFolder);
 
         } catch (final IOException e) {
-            throw new CliExecutionExecution("Failed to ensure presence of working folder.", e);
+            throw new CliExecutionException("Failed to ensure presence of working folder.", e);
         }
 
         return tempFolder;
